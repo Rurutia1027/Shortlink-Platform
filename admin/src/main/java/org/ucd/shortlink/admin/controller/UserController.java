@@ -17,9 +17,12 @@
 
 package org.ucd.shortlink.admin.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.ucd.shortlink.admin.dto.resp.UserRespDTO;
+import org.ucd.shortlink.admin.service.UserService;
 
 import java.util.UUID;
 
@@ -27,12 +30,14 @@ import java.util.UUID;
  * User Management Controller
  */
 @RestController
+@RequiredArgsConstructor
 public class UserController {
+    private final UserService userService;
     /**
      * Query user info by username
      */
     @GetMapping("/api/shortlink/v1/user/{username}")
-    public String getUserByUserName(@PathVariable("username") String username) {
-        return UUID.randomUUID().toString() + "-" + username;
+    public UserRespDTO getUserByUserName(@PathVariable("username") String username) {
+        return userService.getUserByUsername(username);
     }
 }

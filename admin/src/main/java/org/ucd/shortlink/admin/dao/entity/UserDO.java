@@ -15,16 +15,26 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.admin;
+package org.ucd.shortlink.admin.dao.entity;
 
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
-@SpringBootApplication
-@MapperScan("org.ucd.shortlink.admin.dao.mapper")
-public class ShortLinkAdminApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(ShortLinkAdminApplication.class, args);
-    }
+import java.util.Date;
+/**
+ *  User Object
+ */
+@Data
+@TableName("t_user")
+public class UserDO {
+    private Long id;
+    private String username;
+    private String password;
+    private String realName;
+    private String phone;
+    private String email;
+    private Long deletionTime;
+    private Date createTime;
+    private Date updateTime;
+    private Boolean delFlag;
 }

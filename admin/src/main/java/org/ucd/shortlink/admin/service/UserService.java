@@ -15,16 +15,20 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.admin;
+package org.ucd.shortlink.admin.service;
 
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.baomidou.mybatisplus.extension.service.IService;
+import org.ucd.shortlink.admin.dao.entity.UserDO;
+import org.ucd.shortlink.admin.dto.resp.UserRespDTO;
 
-@SpringBootApplication
-@MapperScan("org.ucd.shortlink.admin.dao.mapper")
-public class ShortLinkAdminApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(ShortLinkAdminApplication.class, args);
-    }
+/**
+ * User service interface
+ */
+public interface UserService extends IService<UserDO> {
+    /**
+     * Response user info by username
+     * @param username user name
+     * @return user response body
+     */
+    UserRespDTO getUserByUsername(String username);
 }

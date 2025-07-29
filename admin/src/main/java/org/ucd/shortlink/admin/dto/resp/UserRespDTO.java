@@ -15,16 +15,20 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.admin;
+package org.ucd.shortlink.admin.dto.resp;
 
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import lombok.Data;
 
-@SpringBootApplication
-@MapperScan("org.ucd.shortlink.admin.dao.mapper")
-public class ShortLinkAdminApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(ShortLinkAdminApplication.class, args);
-    }
+import java.util.Date;
+
+/**
+ * User response DTO
+ */
+@Data
+public class UserRespDTO {
+    private Long id;
+    private String username;
+    private String realName;
+    private String phone;
+    private String email;
 }

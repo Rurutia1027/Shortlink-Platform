@@ -15,16 +15,13 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.admin;
+package org.ucd.shortlink.admin.dao.mapper;
 
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.ucd.shortlink.admin.dao.entity.UserDO;
 
-@SpringBootApplication
-@MapperScan("org.ucd.shortlink.admin.dao.mapper")
-public class ShortLinkAdminApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(ShortLinkAdminApplication.class, args);
-    }
+/**
+ * User Persistent Layer
+ */
+public interface UserMapper extends BaseMapper<UserDO> {
 }
