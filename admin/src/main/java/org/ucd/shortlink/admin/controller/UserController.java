@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.common.convention.result.Results;
-import org.ucd.shortlink.admin.common.enums.UserErrorCodeEnum;
 import org.ucd.shortlink.admin.dto.resp.UserRespDTO;
 import org.ucd.shortlink.admin.service.UserService;
 
@@ -39,12 +38,6 @@ public class UserController {
      */
     @GetMapping("/api/shortlink/v1/user/{username}")
     public Result<UserRespDTO> getUserByUserName(@PathVariable("username") String username) {
-        UserRespDTO ret = userService.getUserByUsername(username);
-        if (ret == null) {
-            // return Results.failure(UserErrorCodeEnum.USER_NULL );
-            return null;
-        } else {
-            return Results.success(ret);
-        }
+        return Results.success(userService.getUserByUsername(username));
     }
 }
