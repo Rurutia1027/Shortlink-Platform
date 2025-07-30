@@ -19,8 +19,10 @@ package org.ucd.shortlink.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.ucd.shortlink.admin.dao.entity.UserDO;
+import org.ucd.shortlink.admin.dto.req.UserLoginReqDTO;
 import org.ucd.shortlink.admin.dto.req.UserRegisterReqDTO;
 import org.ucd.shortlink.admin.dto.req.UserUpdateReqDTO;
+import org.ucd.shortlink.admin.dto.resp.UserLoginRespDTO;
 import org.ucd.shortlink.admin.dto.resp.UserRespDTO;
 
 /**
@@ -54,4 +56,19 @@ public interface UserService extends IService<UserDO> {
      * @param requestParam update user info request params
      */
     void update(UserUpdateReqDTO requestParam);
+
+    /**
+     * User login request param
+     * @param requestParam user login request params
+     * @return user login response body
+     */
+    UserLoginRespDTO login(UserLoginReqDTO requestParam);
+
+    /**
+     * Checkout user login state by username and token
+     * @param username username
+     * @param token user token
+     * @return user login state, True: login; False: not login.
+     */
+    Boolean checkLogin(String username, String token);
 }
