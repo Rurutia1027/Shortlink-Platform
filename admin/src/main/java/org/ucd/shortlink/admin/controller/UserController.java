@@ -21,6 +21,7 @@ import cn.hutool.core.bean.BeanUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.common.convention.result.Results;
@@ -50,5 +51,13 @@ public class UserController {
     public Result<UserActualRespDTO> getActualUserByUserName(@PathVariable("username") String username) {
         return Results.success(BeanUtil.toBean(userService.getUserByUsername(username),
                 UserActualRespDTO.class));
+    }
+
+    /**
+     * Query username already exist (has been registered)
+     */
+    @GetMapping("/api/shortlink/v1/user/has-username")
+    public Result<Boolean> hasUserName(@RequestParam("username") String username) {
+        return Results.success(userService.hasUserName(username));
     }
 }
