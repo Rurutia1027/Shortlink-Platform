@@ -28,9 +28,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.common.convention.result.Results;
+import org.ucd.shortlink.admin.dto.req.UserLoginReqDTO;
 import org.ucd.shortlink.admin.dto.req.UserRegisterReqDTO;
 import org.ucd.shortlink.admin.dto.req.UserUpdateReqDTO;
 import org.ucd.shortlink.admin.dto.resp.UserActualRespDTO;
+import org.ucd.shortlink.admin.dto.resp.UserLoginRespDTO;
 import org.ucd.shortlink.admin.dto.resp.UserRespDTO;
 import org.ucd.shortlink.admin.service.UserService;
 
@@ -83,5 +85,22 @@ public class UserController {
     public Result<Void> update(@RequestBody UserUpdateReqDTO requestParam) {
         userService.update(requestParam);
         return Results.success();
+    }
+
+    /**
+     * User login
+     */
+    @PostMapping("/api/short-link/v1/user/login")
+    public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO requestParam) {
+        return Results.success(userService.login(requestParam));
+    }
+
+    /**
+     * Check user login state
+     */
+    @GetMapping("/api/short-link/v1/user/check-login")
+    public Result<Boolean> checkLogin(@RequestParam("username") String username, @RequestParam(
+            "token") String token) {
+        return Results.success(userService.checkLogin(username, token));
     }
 }
