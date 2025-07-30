@@ -31,4 +31,11 @@ public interface UserService extends IService<UserDO> {
      * @return user response body
      */
     UserRespDTO getUserByUsername(String username);
+
+    /**
+     * Validate username already exist
+     * @param username username
+     * @return already exist True, not exist False
+     */
+    Boolean hasUserName(String username);
 }
