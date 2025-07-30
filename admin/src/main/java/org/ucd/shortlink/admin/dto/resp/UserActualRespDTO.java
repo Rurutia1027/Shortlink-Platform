@@ -25,12 +25,10 @@ import org.ucd.shortlink.admin.common.serialize.PhoneDesensitizationSerializer;
  * User response DTO
  */
 @Data
-public class UserRespDTO {
+public class UserActualRespDTO {
     private Long id;
     private String username;
     private String realName;
-
-    @JsonSerialize(using = PhoneDesensitizationSerializer.class)
     private String phone;
     private String email;
 }
