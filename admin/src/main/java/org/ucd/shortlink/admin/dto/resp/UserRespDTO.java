@@ -32,5 +32,5 @@ public class UserRespDTO {
 
     @JsonSerialize(using = PhoneDesensitizationSerializer.class)
     private String phone;
-    private String email;
+    private String mail;
 }

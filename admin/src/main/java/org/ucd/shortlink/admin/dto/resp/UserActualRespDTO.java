@@ -30,5 +30,5 @@ public class UserActualRespDTO {
     private String username;
     private String realName;
     private String phone;
-    private String email;
+    private String mail;
 }
