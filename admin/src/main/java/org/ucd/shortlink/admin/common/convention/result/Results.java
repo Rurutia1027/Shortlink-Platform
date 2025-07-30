@@ -1,6 +1,7 @@
 package org.ucd.shortlink.admin.common.convention.result;
 
 import org.ucd.shortlink.admin.common.convention.errorcode.BaseErrorCode;
+import org.ucd.shortlink.admin.common.convention.errorcode.IErrorCode;
 import org.ucd.shortlink.admin.common.convention.exception.AbstractException;
 
 import java.util.Optional;
@@ -56,5 +57,14 @@ public final class Results {
         return new Result<Void>()
                 .setCode(errorCode)
                 .setMessage(errorMessage);
+    }
+
+    /**
+     * construct failure response via IErrorCode entity
+     */
+    public static Result<Void> failure(IErrorCode errorCode) {
+        return new Result<Void>()
+                .setCode(errorCode.code())
+                .setMessage(errorCode.message());
     }
 }

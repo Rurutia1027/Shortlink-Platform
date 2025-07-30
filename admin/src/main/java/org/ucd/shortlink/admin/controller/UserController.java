@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
+import org.ucd.shortlink.admin.common.convention.result.Results;
 import org.ucd.shortlink.admin.common.enums.UserErrorCodeEnum;
 import org.ucd.shortlink.admin.dto.resp.UserRespDTO;
 import org.ucd.shortlink.admin.service.UserService;
@@ -40,10 +41,10 @@ public class UserController {
     public Result<UserRespDTO> getUserByUserName(@PathVariable("username") String username) {
         UserRespDTO ret = userService.getUserByUsername(username);
         if (ret == null) {
-            return new Result<UserRespDTO>().setCode(UserErrorCodeEnum.USER_NULL.code())
-                    .setMessage(UserErrorCodeEnum.USER_NULL.message());
+            // return Results.failure(UserErrorCodeEnum.USER_NULL );
+            return null;
         } else {
-            return new Result<UserRespDTO>().setCode("0").setData(ret);
+            return Results.success(ret);
         }
     }
 }
