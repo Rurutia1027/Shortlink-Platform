@@ -31,4 +31,6 @@ public interface UserService extends IService<UserDO> {
      * @return user response body
      */
     UserRespDTO getUserByUsername(String username);
+
+    Boolean hasUserName(String username);
 }
