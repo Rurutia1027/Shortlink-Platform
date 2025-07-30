@@ -19,6 +19,7 @@ package org.ucd.shortlink.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.ucd.shortlink.admin.dao.entity.UserDO;
+import org.ucd.shortlink.admin.dto.req.UserRegisterReqDTO;
 import org.ucd.shortlink.admin.dto.resp.UserRespDTO;
 
 /**
@@ -38,4 +39,10 @@ public interface UserService extends IService<UserDO> {
      * @return already exist True, not exist False
      */
     Boolean hasUserName(String username);
+
+    /**
+     * User Registration
+     * @param requestParam user register param
+     */
+    void register(UserRegisterReqDTO requestParam);
 }
