@@ -2,17 +2,11 @@ server:
   port: 8002
 
 spring:
+  application:
+    name: short-link-admin
   datasource:
-    url: jdbc:mysql://localhost:3306/link?characterEncoding=utf-8
-    username: admin
-    password: admin
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      connection-test-query: select 1
-      connection-timeout: 20000
-      idle-timeout: 300000
-      maximum-pool-size: 5
-      minimum-idle: 5
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+    url: jdbc:shardingsphere:classpath:shardingsphere-config.yaml
 
   data:
     redis:
