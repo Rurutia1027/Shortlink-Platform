@@ -11,5 +11,5 @@ public class UserRegisterReqDTO {
     private String password;
     private String realName;
     private String phone;
-    private String email;
+    private String mail;
 }

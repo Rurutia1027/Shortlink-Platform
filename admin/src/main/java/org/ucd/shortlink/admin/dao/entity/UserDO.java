@@ -34,7 +34,7 @@ public class UserDO {
     private String password;
     private String realName;
     private String phone;
-    private String email;
+    private String mail;
     private Long deletionTime;
 
     @TableField(fill = FieldFill.INSERT)
