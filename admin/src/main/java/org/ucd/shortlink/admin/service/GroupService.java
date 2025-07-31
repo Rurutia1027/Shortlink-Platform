@@ -2,6 +2,8 @@ package org.ucd.shortlink.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.ucd.shortlink.admin.dao.entity.GroupDO;
+import org.ucd.shortlink.admin.dto.req.ShortLinkGroupSortRespDTO;
+import org.ucd.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
 
 import java.util.List;
@@ -23,4 +25,25 @@ public interface GroupService extends IService<GroupDO> {
      * @return queried user short link group item collection
      */
     List<ShortLinkGroupRespDTO> listGroup();
+
+    /**
+     * Update short link group record
+     *
+     * @param requestParam group name
+     */
+    void updateGroup(ShortLinkGroupUpdateReqDTO requestParam);
+
+    /**
+     * Delete short link group via gid
+     *
+     * @param gid id of group
+     */
+    void deleteGroup(String gid);
+
+    /**
+     * Short link group sort
+     *
+     * @param requestParam sort param
+     */
+    void sortGroup(List<ShortLinkGroupSortRespDTO> requestParam);
 }
