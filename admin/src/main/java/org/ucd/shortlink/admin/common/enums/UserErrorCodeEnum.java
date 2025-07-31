@@ -6,6 +6,7 @@ import org.ucd.shortlink.admin.common.convention.errorcode.IErrorCode;
  * User error code enumeration.
  */
 public enum UserErrorCodeEnum implements IErrorCode {
+    USER_TOKEN_FAIL("A000200", "User token validation failure"),
     USER_NULL("B000200", "User record does not exist"),
     USER_NAME_EXIST("B000201", "User name already exist"),
     USER_EXIST("B000202", "User record already exists"),
