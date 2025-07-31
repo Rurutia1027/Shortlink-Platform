@@ -1,10 +1,12 @@
 package org.ucd.shortlink.admin.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.common.convention.result.Results;
@@ -40,10 +42,22 @@ public class GroupController {
         return Results.success(groupService.listGroup());
     }
 
+    /**
+     * Update short link group
+     */
     @PutMapping("/api/short-link/v1/group")
     public Result<Void> updateGroup(@RequestBody ShortLinkGroupUpdateReqDTO requestParam) {
         groupService.updateGroup(requestParam);
         return Results.success();
     }
 
+
+    /**
+     * Delete short link group via gid
+     */
+    @DeleteMapping("/api/short-link/v1/group")
+    public Result<Void> updateGroup(@RequestParam String gid) {
+        groupService.deleteGroup(gid);
+        return Results.success();
+    }
 }
