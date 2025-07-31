@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.ucd.shortlink.admin.common.biz.UserContext;
 import org.ucd.shortlink.admin.dao.entity.GroupDO;
 import org.ucd.shortlink.admin.dao.mapper.GroupMapper;
+import org.ucd.shortlink.admin.dto.req.ShortLinkGroupSortRespDTO;
 import org.ucd.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
 import org.ucd.shortlink.admin.service.GroupService;
@@ -72,6 +73,22 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         GroupDO groupDO = new GroupDO();
         groupDO.setDelFlag(1);
         baseMapper.update(groupDO, updateWrapper);
+    }
+
+    @Override
+    public void sortGroup(List<ShortLinkGroupSortRespDTO> requestParam) {
+        requestParam.forEach(item -> {
+            GroupDO groupDO = GroupDO.builder()
+                    .sortOrder(item.getSortOrder())
+                    .build();
+
+            LambdaUpdateWrapper<GroupDO> updateWrapper = Wrappers.lambdaUpdate(GroupDO.class)
+                    .eq(GroupDO::getUsername, UserContext.getUsername())
+                    .eq(GroupDO::getGid, item.getGid())
+                    .eq(GroupDO::getDelFlag, 0);
+
+            baseMapper.update(groupDO, updateWrapper);
+        });
     }
 
     private boolean isGidAvailable(String gid) {

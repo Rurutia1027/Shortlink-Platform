@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.common.convention.result.Results;
 import org.ucd.shortlink.admin.dto.req.ShortLinkGroupSaveReqDTO;
+import org.ucd.shortlink.admin.dto.req.ShortLinkGroupSortRespDTO;
 import org.ucd.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
 import org.ucd.shortlink.admin.service.GroupService;
@@ -58,6 +59,12 @@ public class GroupController {
     @DeleteMapping("/api/short-link/v1/group")
     public Result<Void> updateGroup(@RequestParam String gid) {
         groupService.deleteGroup(gid);
+        return Results.success();
+    }
+
+    @PostMapping("/api/short-link/v1/group/sort")
+    public Result<Void> sortGroup(@RequestBody List<ShortLinkGroupSortRespDTO> requestParam) {
+        groupService.sortGroup(requestParam);
         return Results.success();
     }
 }
