@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.Date;
 
 /**
- *
+ * Database persistent layer base entity
  */
 @Data
 public class BaseDO {
