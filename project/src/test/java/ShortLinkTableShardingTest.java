@@ -9,6 +9,8 @@ public class ShortLinkTableShardingTest {
             "    origin_url      varchar(1024)                  null comment 'original link url address',\n" +
             "    click_num       int default 0                  null comment 'click number',\n" +
             "    gid             varchar(32)                    null comment 'group ID',\n" +
+            "    favicon         varchar(256)                   null comment 'website icon'," +
+            "\n" +
             "    enable_status   tinyint(1)                     null comment 'Enable Flag; 0: disabled, 1: enabled',\n" +
             "    created_type    tinyint(1)                     null comment 'Create Type; 0: Console, 1: Interface',\n" +
             "    valid_date_type tinyint(1)                     null comment 'Validate Type; 0: permanent, 1: customized',\n" +
