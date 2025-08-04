@@ -7,7 +7,9 @@ import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.ucd.shortlink.admin.common.convention.result.Result;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 
 import java.util.HashMap;
@@ -17,6 +19,26 @@ import java.util.Map;
  * Short link endpoint remote call service
  */
 public interface ShortLinkRemoteService {
+
+    /**
+     * Create Short Link Request
+     *
+     * @param requestParam create short link request param
+     * @return short link creation response body
+     */
+    default Result<ShortLinkCreateRespDTO> createShortLink(ShortLinkCreateReqDTO requestParam) {
+        String resultBodyStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/create", JSON.toJSONString(requestParam));
+        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
+        });
+    }
+
+
+    /**
+     * Short link paging query
+     *
+     * @param requestParam paging request param
+     * @return short link paging query response body
+     */
     default Result<Page<ShortLinkPageRespDTO>> pageShortLink(@RequestBody ShortLinkPageReqDTO requestParam) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("gid", requestParam.getGid());
