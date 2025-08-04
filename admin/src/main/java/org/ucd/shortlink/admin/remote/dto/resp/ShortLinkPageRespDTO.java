@@ -1,4 +1,4 @@
-package org.ucd.shortlink.project.dto.resp;
+package org.ucd.shortlink.admin.remote.dto.resp;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

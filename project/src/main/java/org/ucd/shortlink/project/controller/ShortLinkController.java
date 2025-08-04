@@ -36,7 +36,7 @@ public class ShortLinkController {
     /**
      * Paging query short link
      */
-    @GetMapping("/api/short-link/v1/page")
+    @PostMapping("/api/short-link/v1/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(@RequestBody ShortLinkPageReqDTO requestParam) {
         return Results.success(shortLinkService.pageShortLink(requestParam));
     }
