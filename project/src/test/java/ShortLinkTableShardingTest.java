@@ -1,5 +1,21 @@
 public class ShortLinkTableShardingTest {
-    public static final String SQL = "create table t_link_%d\n" +
+
+
+    public static final String SQL = "create table t_group_%d\n" +
+            "(\n" +
+            "    id          bigint auto_increment comment 'id'\n" +
+            "        primary key,\n" +
+            "    gid         varchar(32)  null comment 'group id',\n" +
+            "    name        varchar(64)  null comment 'group name',\n" +
+            "    username    varchar(256) null comment 'group username',\n" +
+            "    create_time datetime     null comment 'creat timestamp',\n" +
+            "    update_time datetime     null comment 'update timestamp',\n" +
+            "    del_flag    tinyint(1)   null comment 'delete flag; 0: not delete, 1: deleted',\n" +
+            "    sort_order  int          null comment 'sort order',\n" +
+            "    unique key `idx_unique_username_gid` (`gid`, `username`) using btree\n" +
+            ")char set =utf8mb4;";
+
+    public static final String SQL_T_LINK = "create table t_link_%d\n" +
             "(\n" +
             "    id              bigint auto_increment comment 'ID'\n" +
             "        primary key,\n" +
