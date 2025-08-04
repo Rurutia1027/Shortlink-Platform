@@ -13,6 +13,8 @@ import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 
 @RestController
 public class ShortLinkController {
+
+    // TODO: Refactor into SpringCloud Feign invocation
     ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
     };
 
