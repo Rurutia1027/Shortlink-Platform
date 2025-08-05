@@ -8,15 +8,20 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.ucd.shortlink.admin.common.biz.UserContext;
+import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.dao.entity.GroupDO;
 import org.ucd.shortlink.admin.dao.mapper.GroupMapper;
 import org.ucd.shortlink.admin.dto.req.ShortLinkGroupSortRespDTO;
 import org.ucd.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
+import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
+import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
 import org.ucd.shortlink.admin.service.GroupService;
 import org.ucd.shortlink.admin.toolkit.RandomGenerator;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * short link grouping interface implement class
@@ -24,6 +29,11 @@ import java.util.List;
 @Slf4j
 @Service
 public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implements GroupService {
+
+    // TODO: Refactor into SpringCloud Feign invocation
+    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
+    };
+
     @Override
     public void saveGroup(String groupName) {
         String gid = RandomGenerator.generateRandom();
@@ -47,9 +57,24 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
                 .eq(GroupDO::getDelFlag, 0)
                 .eq(GroupDO::getUsername, UserContext.getUsername())
                 .orderByDesc(GroupDO::getSortOrder, GroupDO::getUpdateTime);
-
         List<GroupDO> groupDOList = baseMapper.selectList(queryWrapper);
-        return BeanUtil.copyToList(groupDOList, ShortLinkGroupRespDTO.class);
+        Result<List<ShortLinkGroupCountQueryRespDTO>> listResult =
+                shortLinkRemoteService.listGroupShortLinkCount(groupDOList.stream().map(GroupDO::getGid).toList());
+
+
+        // convert remote call queried count entity into hash map
+        Map<String, Integer> shortLinkGroupCountMap = new HashMap<>();
+        for (ShortLinkGroupCountQueryRespDTO countDto : listResult.getData()) {
+            shortLinkGroupCountMap.put(countDto.getGid(), countDto.getShortLinkCount());
+        }
+
+        List<ShortLinkGroupRespDTO> shortLinkGroupRespDTOList = BeanUtil.copyToList(groupDOList,
+                ShortLinkGroupRespDTO.class);
+        shortLinkGroupRespDTOList.forEach(each -> {
+            each.setShortLinkCount(shortLinkGroupCountMap.get(each.getGid()));
+        });
+
+        return shortLinkGroupRespDTOList;
     }
 
     @Override

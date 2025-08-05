@@ -2,11 +2,15 @@ package org.ucd.shortlink.project.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
 import org.ucd.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
+
+import java.util.List;
 
 /**
  * Short link service layer
@@ -22,6 +26,17 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
 
     /**
      * Page query short link items
+     *
+     * @param requestParam request parameters
+     * @return return paging short link response
      */
     IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestParam);
+
+    /**
+     * Query group count each short link group
+     *
+     * @param requestParam request parameters
+     * @return list of group cnt for each query gid
+     */
+    List<ShortLinkGroupCountQueryRespDTO> listGroupShortLinkCount(@RequestParam List<String> requestParam);
 }
