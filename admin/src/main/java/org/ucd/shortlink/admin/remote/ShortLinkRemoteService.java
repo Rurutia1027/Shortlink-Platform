@@ -6,11 +6,11 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 
@@ -71,5 +71,16 @@ public interface ShortLinkRemoteService {
                 requestMap);
         return JSON.parseObject(resultBodyStr, new TypeReference<>() {
         });
+    }
+
+
+    /**
+     * Update short link
+     *
+     * @param requestParam short link update request param
+     */
+    default void updateShortLink(ShortLinkUpdateReqDTO requestParam) {
+        String resultBodyStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/update",
+                JSON.toJSONString(requestParam));
     }
 }
