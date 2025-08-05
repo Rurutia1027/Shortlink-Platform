@@ -1,4 +1,4 @@
-# 🚀 ShortLink SaaS Platform | [![SaaS Short Link Platform Build](https://github.com/Rurutia1027/shortlink-platform/actions/workflows/ci.yml/badge.svg?branch=main&event=status)](https://github.com/Rurutia1027/shortlink-platform/actions/workflows/ci.yml)
+# 🚀 ShortLink SaaS Platform | [![SaaS Short Link Platform Build](https://github.com/Rurutia1027/shortlink-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Rurutia1027/shortlink-platform/actions/workflows/ci.yml)
 
 A scalable, high-performance SaaS short link system designed for enterprise-grade usage. Built with modern Java stack (
 JDK 17, Spring Boot 3, Spring Cloud), it provides secure, efficient, and observable short link services including link
