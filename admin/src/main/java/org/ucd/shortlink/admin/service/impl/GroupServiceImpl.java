@@ -22,6 +22,7 @@ import org.ucd.shortlink.admin.toolkit.RandomGenerator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * short link grouping interface implement class
@@ -36,16 +37,21 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
 
     @Override
     public void saveGroup(String groupName) {
+        saveGroup(UserContext.getUsername(), groupName);
+    }
+
+    @Override
+    public void saveGroup(String username, String groupName) {
         String gid = RandomGenerator.generateRandom();
 
-        while (!isGidAvailable(gid)) {
+        while (!isGidAvailable(username, gid)) {
             gid = RandomGenerator.generateRandom();
         }
 
         GroupDO groupDO = GroupDO.builder()
                 .gid(gid)
                 .sortOrder(0)
-                .username(UserContext.getUsername())
+                .username(username)
                 .name(groupName)
                 .build();
         baseMapper.insert(groupDO);
@@ -115,10 +121,11 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         });
     }
 
-    private boolean isGidAvailable(String gid) {
+    private boolean isGidAvailable(String username, String gid) {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getGid, gid)
-                .eq(GroupDO::getUsername, UserContext.getUsername());
+                .eq(GroupDO::getUsername,
+                        username != null ? username : UserContext.getUsername());
         GroupDO queriedGroupDO = baseMapper.selectOne(queryWrapper);
         return queriedGroupDO == null;
     }
