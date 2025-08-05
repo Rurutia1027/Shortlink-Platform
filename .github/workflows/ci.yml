@@ -1,0 +1,70 @@
+name: SaaS Short Link Platform Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:6.2
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Init MySQL schema and user
+        run: |
+          echo "CREATE DATABASE link;" | mysql -h 127.0.0.1 -P 3306 -uroot -proot
+          echo "CREATE USER 'admin'@'%' IDENTIFIED BY 'admin';" | mysql -h 127.0.0.1 -P 3306 -uroot -proot
+          echo "GRANT ALL PRIVILEGES ON link.* TO 'admin'@'%';" | mysql -h 127.0.0.1 -P 3306 -uroot -proot
+          echo "FLUSH PRIVILEGES;" | mysql -h 127.0.0.1 -P 3306 -uroot -proot
+
+      - name: Wait for services
+        run: |
+          echo "Sleeping 20s to ensure MySQL & Redis are ready..."
+          sleep 20
+
+      - name: Build with Maven
+        run: mvn clean install -DskipTests
+
+      - name: Run Tests
+        run: mvn test
