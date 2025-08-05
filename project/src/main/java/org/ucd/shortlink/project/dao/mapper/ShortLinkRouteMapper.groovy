@@ -6,6 +6,6 @@ import org.ucd.shortlink.project.dao.entity.ShortLinkRouteDO
 /**
  * Short Link Route Persistent Layer
  */
-interface ShortLinkRouteMapper  extends BaseMapper<ShortLinkRouteDO> {
+public interface ShortLinkRouteMapper  extends BaseMapper<ShortLinkRouteDO> {
 
 }
