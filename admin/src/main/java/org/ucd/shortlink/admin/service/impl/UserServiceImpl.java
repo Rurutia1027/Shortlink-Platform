@@ -42,6 +42,7 @@ import org.ucd.shortlink.admin.dto.req.UserRegisterReqDTO;
 import org.ucd.shortlink.admin.dto.req.UserUpdateReqDTO;
 import org.ucd.shortlink.admin.dto.resp.UserLoginRespDTO;
 import org.ucd.shortlink.admin.dto.resp.UserRespDTO;
+import org.ucd.shortlink.admin.service.GroupService;
 import org.ucd.shortlink.admin.service.UserService;
 
 import java.util.Map;
@@ -60,6 +61,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     private final RBloomFilter<String> userRegisterCachePenetrationBloomFilter;
     private final RedissonClient redissonClient;
     private final StringRedisTemplate stringRedisTemplate;
+    private final GroupService groupService;
 
     @Override
     public UserRespDTO getUserByUsername(String username) {
@@ -96,6 +98,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 throw new ClientException(UserErrorCodeEnum.USER_SAVE_ERROR);
             }
             userRegisterCachePenetrationBloomFilter.add(requestParam.getUsername());
+            groupService.saveGroup(requestParam.getUsername(), "DEFAULT_GROUP");
         } catch (DuplicateKeyException ex) {
             throw new ClientException(UserErrorCodeEnum.USER_EXIST);
         } finally {

@@ -1,6 +1,5 @@
-package org.ucd.shortlink.project.dto.req;
+package org.ucd.shortlink.admin.remote.dto.req;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 

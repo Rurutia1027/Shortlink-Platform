@@ -19,6 +19,16 @@ public interface GroupService extends IService<GroupDO> {
      */
     void saveGroup(String groupName);
 
+
+    /**
+     * Add a short link grouping entity
+     *
+     * @param username
+     *
+     * @param groupName short link group name
+     */
+    void saveGroup(String username, String groupName);
+
     /**
      * Query short link group by username
      *
