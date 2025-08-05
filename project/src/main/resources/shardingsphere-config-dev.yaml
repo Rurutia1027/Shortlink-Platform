@@ -17,9 +17,20 @@ rules:
           standard:
             shardingColumn: gid
             shardingAlgorithmName: link_table_hash_mod
+      t_link_route:
+        # declare physical table name(s)
+        actualDataNodes: ds_0.t_link_route_${0..15}
+        tableStrategy:
+          standard:
+            shardingColumn: full_short_url
+            shardingAlgorithmName: link_route_table_hash_mod
 
     shardingAlgorithms:
       link_table_hash_mod:
+        type: HASH_MOD
+        props:
+          sharding-count: 16
+      link_route_table_hash_mod:
         type: HASH_MOD
         props:
           sharding-count: 16

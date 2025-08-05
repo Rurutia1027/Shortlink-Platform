@@ -8,7 +8,10 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBloomFilter;
 import org.springframework.dao.DuplicateKeyException;
@@ -18,7 +21,9 @@ import org.ucd.shortlink.project.common.convention.exception.ClientException;
 import org.ucd.shortlink.project.common.convention.exception.ServiceException;
 import org.ucd.shortlink.project.common.enums.ValiDateTypeEnum;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
+import org.ucd.shortlink.project.dao.entity.ShortLinkRouteDO;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkMapper;
+import org.ucd.shortlink.project.dao.mapper.ShortLinkRouteMapper;
 import org.ucd.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
@@ -41,6 +46,7 @@ import java.util.Objects;
 public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLinkDO> implements ShortLinkService {
 
     private final RBloomFilter<String> shortUriCreationCachePenetrationBloomFilter;
+    private final ShortLinkRouteMapper shortLinkRouteMapper;
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
@@ -60,8 +66,14 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .enableStatus(0)
                 .build();
 
+        ShortLinkRouteDO shortLinkRouteDO = ShortLinkRouteDO.builder()
+                .fullShortUrl(fullShortUrl)
+                .gid(requestParam.getGid())
+                .build();
+
         try {
             baseMapper.insert(shortLinkDO);
+            shortLinkRouteMapper.insert(shortLinkRouteDO);
         } catch (DuplicateKeyException ex) {
             // TODO: how to handle error detected short link url ?
             // - short link url -> already exist in cache
@@ -75,7 +87,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         shortUriCreationCachePenetrationBloomFilter.add(fullShortUrl);
         return ShortLinkCreateRespDTO.builder()
                 .originalUrl(requestParam.getOriginUrl())
-                .fullShortUrl(shortLinkDO.getFullShortUrl())
+                .fullShortUrl(requestParam.getDomainProtocol() + "//" +
+                        shortLinkDO.getFullShortUrl())
                 .gid(requestParam.getGid())
                 .build();
     }
@@ -151,6 +164,32 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
             baseMapper.delete(updateWrapper);
             baseMapper.insert(shortLinkDO);
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public void restoreUrl(String shortUri, HttpServletRequest request, HttpServletResponse response) {
+        String fullShortUrl = request.getServerName() + "/" + shortUri;
+        LambdaQueryWrapper<ShortLinkRouteDO> linkRouteQueryWrapper = Wrappers.lambdaQuery(ShortLinkRouteDO.class)
+                .eq(ShortLinkRouteDO::getFullShortUrl, fullShortUrl);
+        ShortLinkRouteDO shortLinkRouteDO =
+                shortLinkRouteMapper.selectOne(linkRouteQueryWrapper);
+
+        if (shortLinkRouteDO == null) {
+            // TODO: risk control here
+            return;
+        }
+
+        LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                .eq(ShortLinkDO::getGid, shortLinkRouteDO.getGid())
+                .eq(ShortLinkDO::getFullShortUrl, fullShortUrl)
+                .eq(ShortLinkDO::getDelFlag, 0)
+                .eq(ShortLinkDO::getEnableStatus, 0);
+
+        ShortLinkDO shortLinkDO = baseMapper.selectOne(queryWrapper);
+        if (shortLinkDO != null) {
+            response.sendRedirect(shortLinkDO.getOriginUrl());
         }
     }
 

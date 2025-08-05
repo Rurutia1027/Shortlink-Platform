@@ -12,6 +12,11 @@ import java.util.Date;
 @Data
 public class ShortLinkCreateReqDTO {
     /**
+     * Protocol name
+     */
+    private String domainProtocol;
+
+    /**
      * Domain name
      */
     private String domain;

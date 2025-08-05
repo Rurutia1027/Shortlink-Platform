@@ -2,6 +2,9 @@ package org.ucd.shortlink.project.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
 import org.ucd.shortlink.project.dto.req.ShortLinkCreateReqDTO;
@@ -47,4 +50,12 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @param requestParam update short link request
      */
     void updateShortLink(ShortLinkUpdateReqDTO requestParam);
+
+    /**
+     * Short link redirect
+     * @param shortUri short link suffix
+     * @param request http request
+     * @param response http response
+     */
+    void restoreUrl(String shortUri, HttpServletRequest request, HttpServletResponse response);
 }

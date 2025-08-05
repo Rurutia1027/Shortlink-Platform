@@ -1,10 +1,13 @@
 package org.ucd.shortlink.project.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +31,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ShortLinkController {
     private final ShortLinkService shortLinkService;
+
+    @GetMapping("/{short-uri}")
+    public void restoreUrl(@PathVariable("short-uri") String shortUri,
+                                           HttpServletRequest request,
+                                           HttpServletResponse response) {
+        shortLinkService.restoreUrl(shortUri, request, response);
+    }
+
 
     /**
      * Create short link

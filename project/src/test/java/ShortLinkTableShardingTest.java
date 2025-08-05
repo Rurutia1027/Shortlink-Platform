@@ -1,7 +1,13 @@
 public class ShortLinkTableShardingTest {
+    public static final String SQL = "create table t_link_route_%d\n" +
+            "(\n" +
+            "    id             bigint auto_increment\n" +
+            "        primary key,\n" +
+            "    gid            varchar(32)  null,\n" +
+            "    full_short_url varchar(128) null\n" +
+            ");";
 
-
-    public static final String SQL = "create table t_group_%d\n" +
+    public static final String SQL_T_GROUP = "create table t_group_%d\n" +
             "(\n" +
             "    id          bigint auto_increment comment 'id'\n" +
             "        primary key,\n" +
