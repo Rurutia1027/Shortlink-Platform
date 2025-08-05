@@ -15,7 +15,6 @@ jobs:
         image: redis:6.2
         ports:
           - 6379:6379
-        entrypoint: [ "redis-server", "--requirepass", "123456" ]
         options: >-
           --health-cmd "redis-cli -a 123456 ping"
           --health-interval 10s
