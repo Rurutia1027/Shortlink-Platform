@@ -32,6 +32,12 @@ import java.util.List;
 public class ShortLinkController {
     private final ShortLinkService shortLinkService;
 
+    /**
+     * Entry point for short link request redirect to original url address.
+     * @param shortUri request short url address
+     * @param request HTTP request
+     * @param response HTTP response
+     */
     @GetMapping("/{short-uri}")
     public void restoreUrl(@PathVariable("short-uri") String shortUri,
                                            HttpServletRequest request,
