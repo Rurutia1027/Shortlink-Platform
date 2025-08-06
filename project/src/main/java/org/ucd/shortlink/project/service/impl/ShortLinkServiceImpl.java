@@ -40,8 +40,10 @@ import org.ucd.shortlink.project.toolkit.HashUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static org.ucd.shortlink.project.common.constant.RedisKeyConstant.LOCK_REDIRECT_SHORT_LINK_KEY;
+import static org.ucd.shortlink.project.common.constant.RedisKeyConstant.REDIRECT_IS_BLANK_SHORT_LINK_KEY;
 import static org.ucd.shortlink.project.common.constant.RedisKeyConstant.REDIRECT_SHORT_LINK_KEY;
 
 /**
@@ -191,6 +193,26 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             return;
         }
 
+        boolean containsShortUri =
+                shortUriCreationCachePenetrationBloomFilter.contains(fullShortUrl);
+
+        // bloom filter detected queried short link url do not have cached redirect url
+        // address, directly return
+        if (!containsShortUri) {
+            // Risk Control:
+            return;
+        }
+
+        String redirectBlankShortLinkUrl = stringRedisTemplate.opsForValue()
+                .get(String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl));
+
+        // queried short url mapped a blank/invalid redirect url address, redirect invalid,
+        // directly return
+        if (StrUtil.isNotBlank(redirectBlankShortLinkUrl)) {
+            // Risk Control:
+            return;
+        }
+
         // first cache cannot fetch original url address, race for lock and then query DB
         RLock lock = redissonClient.getLock(String.format(LOCK_REDIRECT_SHORT_LINK_KEY,
                 fullShortUrl));
@@ -204,6 +226,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
             // fetched original url address success redirect directly
             if (StrUtil.isNotBlank(originalLink)) {
+                // Risk Control:
                 response.sendRedirect(originalLink);
                 return;
             }
@@ -217,6 +240,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             // locates in
             ShortLinkRouteDO shortLinkRouteDO = shortLinkRouteMapper
                     .selectOne(linkRouteQueryWrapper);
+
+            if (shortLinkRouteDO == null) {
+                // Risk Control: if we got here, it means there are some
+                // fraud requests try to attach this entry point by using invalid short url
+                // just cache a dash as occupation value
+                stringRedisTemplate.opsForValue()
+                        .set(String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
+                return;
+            }
 
             // then take gid continue query short link table to fetch original url
             LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
@@ -233,6 +265,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             if (shortLinkDO != null) {
                 stringRedisTemplate.opsForValue().set(String.format(REDIRECT_SHORT_LINK_KEY,
                         fullShortUrl), shortLinkDO.getOriginUrl());
+                response.sendRedirect(shortLinkDO.getOriginUrl());
             }
 
         } finally {
