@@ -2,6 +2,7 @@ package org.ucd.shortlink.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.StrBuilder;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -14,7 +15,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBloomFilter;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ucd.shortlink.project.common.convention.exception.ClientException;
@@ -32,10 +36,16 @@ import org.ucd.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import org.ucd.shortlink.project.service.ShortLinkService;
 import org.ucd.shortlink.project.toolkit.HashUtil;
+import org.ucd.shortlink.project.toolkit.LinkUtil;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+import static org.ucd.shortlink.project.common.constant.RedisKeyConstant.LOCK_REDIRECT_SHORT_LINK_KEY;
+import static org.ucd.shortlink.project.common.constant.RedisKeyConstant.REDIRECT_IS_BLANK_SHORT_LINK_KEY;
+import static org.ucd.shortlink.project.common.constant.RedisKeyConstant.REDIRECT_SHORT_LINK_KEY;
 
 /**
  * Short link service implementor
@@ -47,6 +57,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     private final RBloomFilter<String> shortUriCreationCachePenetrationBloomFilter;
     private final ShortLinkRouteMapper shortLinkRouteMapper;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final RedissonClient redissonClient;
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestParam) {
@@ -84,6 +96,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             }
         }
 
+        // Cache Warm Up Here
+        stringRedisTemplate.opsForValue().set(
+                String.format(REDIRECT_SHORT_LINK_KEY, fullShortUrl),
+                requestParam.getOriginUrl(),
+                LinkUtil.genShortLinkCacheValidDate(requestParam.getValidDate()), TimeUnit.MILLISECONDS
+        );
         shortUriCreationCachePenetrationBloomFilter.add(fullShortUrl);
         return ShortLinkCreateRespDTO.builder()
                 .originalUrl(requestParam.getOriginUrl())
@@ -174,26 +192,93 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     @Override
     public void restoreUrl(String shortUri, HttpServletRequest request, HttpServletResponse response) {
         String fullShortUrl = request.getServerName() + "/" + shortUri;
-        LambdaQueryWrapper<ShortLinkRouteDO> linkRouteQueryWrapper = Wrappers.lambdaQuery(ShortLinkRouteDO.class)
-                .eq(ShortLinkRouteDO::getFullShortUrl, fullShortUrl);
-        ShortLinkRouteDO shortLinkRouteDO =
-                shortLinkRouteMapper.selectOne(linkRouteQueryWrapper);
+        String originalLink = stringRedisTemplate.opsForValue().get(String.format(REDIRECT_SHORT_LINK_KEY, fullShortUrl));
 
-        if (shortLinkRouteDO == null) {
-            // TODO: risk control here
+        // first cache query fetch original url address, directly redirect and exit
+        if (StrUtil.isNotBlank(originalLink)) {
+            response.sendRedirect(originalLink);
             return;
         }
 
-        LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
-                .eq(ShortLinkDO::getGid, shortLinkRouteDO.getGid())
-                .eq(ShortLinkDO::getFullShortUrl, fullShortUrl)
-                .eq(ShortLinkDO::getDelFlag, 0)
-                .eq(ShortLinkDO::getEnableStatus, 0);
+        boolean containsShortUri =
+                shortUriCreationCachePenetrationBloomFilter.contains(fullShortUrl);
 
-        ShortLinkDO shortLinkDO = baseMapper.selectOne(queryWrapper);
-        if (shortLinkDO != null) {
-            response.sendRedirect(shortLinkDO.getOriginUrl());
+        // bloom filter detected queried short link url do not have cached redirect url
+        // address, directly return
+        if (!containsShortUri) {
+            // Risk Control:
+            return;
         }
+
+        String redirectBlankShortLinkUrl = stringRedisTemplate.opsForValue()
+                .get(String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl));
+
+        // queried short url mapped a blank/invalid redirect url address, redirect invalid,
+        // directly return
+        if (StrUtil.isNotBlank(redirectBlankShortLinkUrl)) {
+            // Risk Control:
+            return;
+        }
+
+        // first cache cannot fetch original url address, race for lock and then query DB
+        RLock lock = redissonClient.getLock(String.format(LOCK_REDIRECT_SHORT_LINK_KEY,
+                fullShortUrl));
+        lock.lock();
+        try {
+            // when lock fetched via current thread, re-try fetch original url address from
+            // redis cache; why second-fetch because this lock can be release by previous db
+            // query thread -- after db fetching original url address already updated
+            // to redis cache
+            originalLink = stringRedisTemplate.opsForValue().get(String.format(REDIRECT_SHORT_LINK_KEY, fullShortUrl));
+
+            // fetched original url address success redirect directly
+            if (StrUtil.isNotBlank(originalLink)) {
+                // Risk Control:
+                response.sendRedirect(originalLink);
+                return;
+            }
+
+            // redis cache cannot find cached original url value, then query db
+            LambdaQueryWrapper<ShortLinkRouteDO> linkRouteQueryWrapper = Wrappers
+                    .lambdaQuery(ShortLinkRouteDO.class)
+                    .eq(ShortLinkRouteDO::getFullShortUrl, fullShortUrl);
+
+            // query short-link:gid routing table to fetch which group/gid this short-link
+            // locates in
+            ShortLinkRouteDO shortLinkRouteDO = shortLinkRouteMapper
+                    .selectOne(linkRouteQueryWrapper);
+
+            if (shortLinkRouteDO == null) {
+                // Risk Control: if we got here, it means there are some
+                // fraud requests try to attach this entry point by using invalid short url
+                // just cache a dash as occupation value
+                stringRedisTemplate.opsForValue()
+                        .set(String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
+                return;
+            }
+
+            // then take gid continue query short link table to fetch original url
+            LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                    .eq(ShortLinkDO::getGid, shortLinkRouteDO.getGid())
+                    .eq(ShortLinkDO::getFullShortUrl, fullShortUrl)
+                    .eq(ShortLinkDO::getDelFlag, 0)
+                    .eq(ShortLinkDO::getEnableStatus, 0);
+            ShortLinkDO shortLinkDO = baseMapper.selectOne(queryWrapper);
+
+            // short link's original url address fetched, first save to Cache(so that those
+            // the same redis lock fetchers do not need to query DB anymore -- second query
+            // redis cache the original url address can be grabbed), after updating cache then
+            // continue executing redirection
+            if (shortLinkDO != null) {
+                stringRedisTemplate.opsForValue().set(String.format(REDIRECT_SHORT_LINK_KEY,
+                        fullShortUrl), shortLinkDO.getOriginUrl());
+                response.sendRedirect(shortLinkDO.getOriginUrl());
+            }
+
+        } finally {
+            lock.unlock();
+        }
+
     }
 
     private Boolean isShortUriCacheAvailable(String fullShortUrl) {
