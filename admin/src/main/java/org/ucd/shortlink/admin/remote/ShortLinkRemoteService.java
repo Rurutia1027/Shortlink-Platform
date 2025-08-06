@@ -4,10 +4,13 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
@@ -80,7 +83,7 @@ public interface ShortLinkRemoteService {
      * @param requestParam short link update request param
      */
     default void updateShortLink(ShortLinkUpdateReqDTO requestParam) {
-        String resultBodyStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/update",
+        HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/update",
                 JSON.toJSONString(requestParam));
     }
 
@@ -96,6 +99,40 @@ public interface ShortLinkRemoteService {
         String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/title" +
                 "?url=" + url);
         return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
+    }
+
+
+    /**
+     * Save recycled Short Link Entity
+     *
+     * @param requestParam short link info to be recycled
+     */
+    default void saveRecycleBin(RecycleBinSaveReqDTO requestParam) {
+        HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/save",
+                JSON.toJSONString(requestParam));
+    }
+
+
+    /**
+     * Page query recycled Short Link
+     *
+     * @param requestParam paging request param
+     * @return short link paging query response body
+     */
+    default Result<IPage<ShortLinkPageRespDTO>> pageRecycledShortLink(@RequestBody ShortLinkRecycleBinPageReqDTO requestParam) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("gidList", requestParam.getGidList());
+        requestMap.put("current", requestParam.getCurrent());
+        requestMap.put("size", requestParam.getSize());
+        String body = JSON.toJSONString(requestMap);
+        String resultPageStr = HttpRequest.post("http://127.0.0.1:8001/api/short-link/v1" +
+                        "/recycle-bin/page")
+                .header("Content-Type", "application/json")
+                .body(body)
+                .execute()
+                .body();
+        return JSON.parseObject(resultPageStr, new TypeReference<>() {
         });
     }
 }

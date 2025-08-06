@@ -283,10 +283,10 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             // the same redis lock fetchers do not need to query DB anymore -- second query
             // redis cache the original url address can be grabbed), after updating cache then
             // continue executing redirection
-            if (shortLinkDO != null) {
+            if (shortLinkDO == null || (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date()))) {
                 // if queried short link item already got expired, add a dash to cache occupy
-                if (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date())) {
-                    stringRedisTemplate.opsForValue().set(
+
+                stringRedisTemplate.opsForValue().set(
                             String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl),
                             "-",
                             30,
@@ -298,12 +298,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     return;
                 }
 
-
                 stringRedisTemplate.opsForValue().set(String.format(REDIRECT_SHORT_LINK_KEY,
                         fullShortUrl), shortLinkDO.getOriginUrl());
                 response.sendRedirect(shortLinkDO.getOriginUrl());
-            }
-
         } finally {
             lock.unlock();
         }
