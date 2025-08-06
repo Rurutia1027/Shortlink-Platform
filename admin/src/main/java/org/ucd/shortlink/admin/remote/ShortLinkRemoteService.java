@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
+import org.ucd.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
@@ -80,7 +81,7 @@ public interface ShortLinkRemoteService {
      * @param requestParam short link update request param
      */
     default void updateShortLink(ShortLinkUpdateReqDTO requestParam) {
-        String resultBodyStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/update",
+        HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/update",
                 JSON.toJSONString(requestParam));
     }
 
@@ -97,5 +98,16 @@ public interface ShortLinkRemoteService {
                 "?url=" + url);
         return JSON.parseObject(resultStr, new TypeReference<>() {
         });
+    }
+
+
+    /**
+     * Save recycled Short Link Entity
+     *
+     * @param requestParam short link info to be recycled
+     */
+    default void saveRecycleBin(RecycleBinSaveReqDTO requestParam) {
+        HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/save",
+                JSON.toJSONString(requestParam));
     }
 }
