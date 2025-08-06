@@ -208,7 +208,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 return;
             }
 
-            // redis cache cannot find cached original url value, query db
+            // redis cache cannot find cached original url value, then query db
             LambdaQueryWrapper<ShortLinkRouteDO> linkRouteQueryWrapper = Wrappers
                     .lambdaQuery(ShortLinkRouteDO.class)
                     .eq(ShortLinkRouteDO::getFullShortUrl, fullShortUrl);
@@ -226,8 +226,10 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .eq(ShortLinkDO::getEnableStatus, 0);
             ShortLinkDO shortLinkDO = baseMapper.selectOne(queryWrapper);
 
-            // short link's original url address fetched, first save to Cache, then execute
-            // redirection
+            // short link's original url address fetched, first save to Cache(so that those
+            // the same redis lock fetchers do not need to query DB anymore -- second query
+            // redis cache the original url address can be grabbed), after updating cache then
+            // continue executing redirection
             if (shortLinkDO != null) {
                 stringRedisTemplate.opsForValue().set(String.format(REDIRECT_SHORT_LINK_KEY,
                         fullShortUrl), shortLinkDO.getOriginUrl());
