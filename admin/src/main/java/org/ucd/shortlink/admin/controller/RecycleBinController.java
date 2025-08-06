@@ -10,7 +10,9 @@ import org.ucd.shortlink.admin.common.convention.result.Results;
 import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
+import org.ucd.shortlink.admin.service.RecycleBinService;
 
 /**
  * Recycle Bin Controller layer
@@ -19,6 +21,9 @@ import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 @RestController
 @RequiredArgsConstructor
 public class RecycleBinController {
+
+    private final RecycleBinService recycleBinService;
+
     // TODO: Refactor into SpringCloud Feign invocation
     ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
     };
@@ -36,7 +41,7 @@ public class RecycleBinController {
      * Paging query short link
      */
     @PostMapping("/api/short-link/admin/v1/recycle-bin/page")
-    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(@RequestBody ShortLinkPageReqDTO requestParam) {
-        return shortLinkRemoteService.pageRecycledShortLink(requestParam);
+    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(@RequestBody ShortLinkRecycleBinPageReqDTO requestParam) {
+        return recycleBinService.pageRecycledShortLink(requestParam);
     }
 }
