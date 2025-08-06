@@ -208,6 +208,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         // address, directly return
         if (!containsShortUri) {
             // Risk Control:
+            response.sendRedirect("/page/notfound");
             return;
         }
 
@@ -218,6 +219,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         // directly return
         if (StrUtil.isNotBlank(redirectBlankShortLinkUrl)) {
             // Risk Control:
+            response.sendRedirect("/page/notfound");
             return;
         }
 
@@ -259,6 +261,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         30,
                         TimeUnit.MINUTES
                 );
+                response.sendRedirect("/page/notfound");
                 return;
             }
 
@@ -283,7 +286,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                             30,
                             TimeUnit.MINUTES
                     );
-                    // an expired short link cannot be redirected, directly return
+                    // an expired short link cannot be redirected, redirect to not found
+                    // page, then return
+                    response.sendRedirect("/page/notfound");
                     return;
                 }
 
