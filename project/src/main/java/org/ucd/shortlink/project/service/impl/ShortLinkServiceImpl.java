@@ -38,6 +38,7 @@ import org.ucd.shortlink.project.service.ShortLinkService;
 import org.ucd.shortlink.project.toolkit.HashUtil;
 import org.ucd.shortlink.project.toolkit.LinkUtil;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -252,8 +253,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 // Risk Control: if we got here, it means there are some
                 // fraud requests try to attach this entry point by using invalid short url
                 // just cache a dash as occupation value
-                stringRedisTemplate.opsForValue()
-                        .set(String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
+                stringRedisTemplate.opsForValue().set(
+                        String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl),
+                        "-",
+                        30,
+                        TimeUnit.MINUTES
+                );
                 return;
             }
 
@@ -270,6 +275,19 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             // redis cache the original url address can be grabbed), after updating cache then
             // continue executing redirection
             if (shortLinkDO != null) {
+                // if queried short link item already got expired, add a dash to cache occupy
+                if (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date())) {
+                    stringRedisTemplate.opsForValue().set(
+                            String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl),
+                            "-",
+                            30,
+                            TimeUnit.MINUTES
+                    );
+                    // an expired short link cannot be redirected, directly return
+                    return;
+                }
+
+
                 stringRedisTemplate.opsForValue().set(String.format(REDIRECT_SHORT_LINK_KEY,
                         fullShortUrl), shortLinkDO.getOriginUrl());
                 response.sendRedirect(shortLinkDO.getOriginUrl());
