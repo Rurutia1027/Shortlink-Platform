@@ -36,6 +36,7 @@ import org.ucd.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import org.ucd.shortlink.project.service.ShortLinkService;
 import org.ucd.shortlink.project.toolkit.HashUtil;
+import org.ucd.shortlink.project.toolkit.LinkUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -95,6 +96,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             }
         }
 
+        // Cache Warm Up Here
+        stringRedisTemplate.opsForValue().set(
+                String.format(REDIRECT_SHORT_LINK_KEY, fullShortUrl),
+                requestParam.getOriginUrl(),
+                LinkUtil.genShortLinkCacheValidDate(requestParam.getValidDate()), TimeUnit.MILLISECONDS
+        );
         shortUriCreationCachePenetrationBloomFilter.add(fullShortUrl);
         return ShortLinkCreateRespDTO.builder()
                 .originalUrl(requestParam.getOriginUrl())
