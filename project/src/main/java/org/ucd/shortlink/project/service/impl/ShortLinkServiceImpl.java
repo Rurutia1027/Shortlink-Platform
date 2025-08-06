@@ -14,6 +14,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -38,6 +41,9 @@ import org.ucd.shortlink.project.service.ShortLinkService;
 import org.ucd.shortlink.project.toolkit.HashUtil;
 import org.ucd.shortlink.project.toolkit.LinkUtil;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -73,6 +79,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .validDate(requestParam.getValidDate())
                 .validDateType(requestParam.getValidDateType())
                 .describe(requestParam.getDescribe())
+                .favicon(getFavicon(requestParam.getOriginUrl()))
                 .shortUri(shortLinkSuffix)
                 .fullShortUrl(fullShortUrl)
                 .enableStatus(0)
@@ -207,6 +214,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         // address, directly return
         if (!containsShortUri) {
             // Risk Control:
+            response.sendRedirect("/page/notfound");
             return;
         }
 
@@ -217,6 +225,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         // directly return
         if (StrUtil.isNotBlank(redirectBlankShortLinkUrl)) {
             // Risk Control:
+            response.sendRedirect("/page/notfound");
             return;
         }
 
@@ -252,8 +261,13 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 // Risk Control: if we got here, it means there are some
                 // fraud requests try to attach this entry point by using invalid short url
                 // just cache a dash as occupation value
-                stringRedisTemplate.opsForValue()
-                        .set(String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
+                stringRedisTemplate.opsForValue().set(
+                        String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl),
+                        "-",
+                        30,
+                        TimeUnit.MINUTES
+                );
+                response.sendRedirect("/page/notfound");
                 return;
             }
 
@@ -270,6 +284,21 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             // redis cache the original url address can be grabbed), after updating cache then
             // continue executing redirection
             if (shortLinkDO != null) {
+                // if queried short link item already got expired, add a dash to cache occupy
+                if (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date())) {
+                    stringRedisTemplate.opsForValue().set(
+                            String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl),
+                            "-",
+                            30,
+                            TimeUnit.MINUTES
+                    );
+                    // an expired short link cannot be redirected, redirect to not found
+                    // page, then return
+                    response.sendRedirect("/page/notfound");
+                    return;
+                }
+
+
                 stringRedisTemplate.opsForValue().set(String.format(REDIRECT_SHORT_LINK_KEY,
                         fullShortUrl), shortLinkDO.getOriginUrl());
                 response.sendRedirect(shortLinkDO.getOriginUrl());
@@ -313,5 +342,22 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         }
 
         return shortUri;
+    }
+
+    @SneakyThrows
+    private String getFavicon(String url) {
+        URL targetUrl = new URL(url);
+        HttpURLConnection connection = (HttpURLConnection) targetUrl.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+        int responseCode = connection.getResponseCode();
+        if (HttpURLConnection.HTTP_OK == responseCode) {
+            Document document = Jsoup.connect(url).get();
+            Element faviconLink = document.select("link[rel~=(?i)^(shortcut )?icon]").first();
+            if (faviconLink != null) {
+                return faviconLink.attr("abs:href");
+            }
+        }
+        return null;
     }
 }

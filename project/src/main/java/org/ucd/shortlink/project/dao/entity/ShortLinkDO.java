@@ -81,4 +81,10 @@ public class ShortLinkDO extends BaseDO {
      */
     @TableField("`describe`")
     private String describe;
+
+
+    /**
+     * Website favicon
+     */
+    private String favicon;
 }
