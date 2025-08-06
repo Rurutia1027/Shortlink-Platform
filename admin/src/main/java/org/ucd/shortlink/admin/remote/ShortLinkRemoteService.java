@@ -83,4 +83,19 @@ public interface ShortLinkRemoteService {
         String resultBodyStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/update",
                 JSON.toJSONString(requestParam));
     }
+
+    /**
+     * Retrieve provided url fetch url website title content in str.
+     *
+     * @param url provided website url address
+     * @return title of the website in str
+     */
+    default Result<String> getTitleByUrl(String url) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("url", url);
+        String resultStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/title" +
+                "?url=" + url);
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
+    }
 }
