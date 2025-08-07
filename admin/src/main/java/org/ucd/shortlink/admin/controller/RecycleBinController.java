@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.common.convention.result.Results;
 import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
+import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
@@ -43,5 +44,14 @@ public class RecycleBinController {
     @PostMapping("/api/short-link/admin/v1/recycle-bin/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(@RequestBody ShortLinkRecycleBinPageReqDTO requestParam) {
         return recycleBinService.pageRecycledShortLink(requestParam);
+    }
+
+    /**
+     * Recover recycled Short Link Item back to normal Short Link.
+     */
+    @PostMapping("/api/short-link/admin/v1/recycle-bin/recover")
+    public Result<Void> recoverRecycleBin(@RequestBody RecycleBinRecoverReqDTO requestParam) {
+        shortLinkRemoteService.recoverRecycleBin(requestParam);
+        return Results.success();
     }
 }

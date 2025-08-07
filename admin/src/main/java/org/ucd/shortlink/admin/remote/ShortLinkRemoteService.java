@@ -9,10 +9,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
-import org.ucd.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRemoveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
@@ -134,5 +136,25 @@ public interface ShortLinkRemoteService {
                 .body();
         return JSON.parseObject(resultPageStr, new TypeReference<>() {
         });
+    }
+
+    /**
+     * Short link recover
+     *
+     * @param requestParam recover short link request param
+     */
+    default void recoverRecycleBin(RecycleBinRecoverReqDTO requestParam) {
+        HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/recover",
+                JSON.toJSONString(requestParam));
+    }
+
+    /**
+     * Remove recycled short link item
+     *
+     * @param requestParam remove short link request param
+     */
+    default void removeRecycleBin(RecycleBinRemoveReqDTO requestParam) {
+        HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/remove",
+                JSON.toJSONString(requestParam));
     }
 }
