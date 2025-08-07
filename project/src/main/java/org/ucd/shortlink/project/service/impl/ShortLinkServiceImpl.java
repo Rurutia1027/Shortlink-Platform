@@ -37,11 +37,13 @@ import org.ucd.shortlink.project.common.convention.exception.ClientException;
 import org.ucd.shortlink.project.common.convention.exception.ServiceException;
 import org.ucd.shortlink.project.common.enums.ValiDateTypeEnum;
 import org.ucd.shortlink.project.dao.entity.LinkAccessStatsDO;
+import org.ucd.shortlink.project.dao.entity.LinkBrowserStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkLocaleStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkOsStatsDO;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
 import org.ucd.shortlink.project.dao.entity.ShortLinkRouteDO;
 import org.ucd.shortlink.project.dao.mapper.LinkAccessStatsMapper;
+import org.ucd.shortlink.project.dao.mapper.LinkBrowserStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkOsStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkMapper;
@@ -86,6 +88,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkAccessStatsMapper linkAccessStatsMapper;
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
     private final LinkOsStatsMapper linkOsStatsMapper;
+    private final LinkBrowserStatsMapper linkBrowserStatsMapper;
 
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
@@ -432,6 +435,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .date(new Date())
                         .build();
                 linkOsStatsMapper.shortLinkOsState(linkOsStatsDO);
+
+                LinkBrowserStatsDO linkBrowserStatsDO = LinkBrowserStatsDO.builder()
+                        .browser(LinkUtil.getBrowser(((HttpServletRequest) request)))
+                        .cnt(1)
+                        .gid(gid)
+                        .fullShortUrl(fullShortUrl)
+                        .date(new Date())
+                        .build();
+                linkBrowserStatsMapper.shortLinkBrowserState(linkBrowserStatsDO);
             }
         } catch (Throwable ex) {
             log.error("Short link request statistic error!", ex);
