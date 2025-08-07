@@ -11,6 +11,7 @@ import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.common.convention.result.Results;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
+import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRemoveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
@@ -58,5 +59,14 @@ public class ShortLinkController {
     @GetMapping("/api/short-link/admin/v1/count")
     public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam List<String> requestParam) {
         return shortLinkRemoteService.listGroupShortLinkCount(requestParam);
+    }
+
+    /**
+     * Remove recycled Short Link Item
+     */
+    @PostMapping("/api/short-link/admin/v1/recycle-bin/remove")
+    public Result<Void> removeRecycleBin(@RequestBody RecycleBinRemoveReqDTO requestParam) {
+        shortLinkRemoteService.removeRecycleBin(requestParam);
+        return Results.success();
     }
 }

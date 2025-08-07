@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.ucd.shortlink.project.dto.req.RecycleBinRecoverReqDTO;
+import org.ucd.shortlink.project.dto.req.RecycleBinRemoveReqDTO;
 import org.ucd.shortlink.project.dto.req.RecycleBinSaveReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
@@ -78,5 +79,16 @@ public class RecycleBinServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLin
         // Remove original Blank dash occupation out from the Cache
         stringRedisTemplate.delete(String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY,
                 requestParam.getFullShortUrl()));
+    }
+
+    @Override
+    public void removeRecycleBin(RecycleBinRemoveReqDTO requestParam) {
+        LambdaUpdateWrapper<ShortLinkDO> updateWrapper =
+                Wrappers.lambdaUpdate(ShortLinkDO.class)
+                        .eq(ShortLinkDO::getFullShortUrl, requestParam.getFullShortUrl())
+                        .eq(ShortLinkDO::getGid, requestParam.getGid())
+                        .eq(ShortLinkDO::getEnableStatus, 1)
+                        .eq(ShortLinkDO::getDelFlag, 0);
+        baseMapper.delete(updateWrapper);
     }
 }
