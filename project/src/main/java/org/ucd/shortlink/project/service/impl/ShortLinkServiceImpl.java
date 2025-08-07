@@ -38,10 +38,12 @@ import org.ucd.shortlink.project.common.convention.exception.ServiceException;
 import org.ucd.shortlink.project.common.enums.ValiDateTypeEnum;
 import org.ucd.shortlink.project.dao.entity.LinkAccessStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkLocaleStatsDO;
+import org.ucd.shortlink.project.dao.entity.LinkOsStatsDO;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
 import org.ucd.shortlink.project.dao.entity.ShortLinkRouteDO;
 import org.ucd.shortlink.project.dao.mapper.LinkAccessStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
+import org.ucd.shortlink.project.dao.mapper.LinkOsStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkRouteMapper;
 import org.ucd.shortlink.project.dto.req.ShortLinkCreateReqDTO;
@@ -58,7 +60,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -84,6 +85,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final RedissonClient redissonClient;
     private final LinkAccessStatsMapper linkAccessStatsMapper;
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
+    private final LinkOsStatsMapper linkOsStatsMapper;
 
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
@@ -421,6 +423,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .date(new Date())
                         .build();
                 linkLocaleStatsMapper.shortLinkLocaleState(linkLocaleStatsDO);
+
+                LinkOsStatsDO linkOsStatsDO = LinkOsStatsDO.builder()
+                        .os(LinkUtil.getOs(request))
+                        .cnt(1)
+                        .gid(gid)
+                        .fullShortUrl(fullShortUrl)
+                        .date(new Date())
+                        .build();
+                linkOsStatsMapper.shortLinkOsState(linkOsStatsDO);
             }
         } catch (Throwable ex) {
             log.error("Short link request statistic error!", ex);

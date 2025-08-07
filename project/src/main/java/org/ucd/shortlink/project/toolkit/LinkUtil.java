@@ -50,4 +50,27 @@ public class LinkUtil {
         }
         return ipAddress;
     }
+
+    /**
+     * Fetch OS info via HTTP request
+     *
+     * @param request HTTP request
+     * @return OS info
+     */
+    public static String getOs(HttpServletRequest request) {
+        String userAgent = request.getHeader("User-Agent");
+        if (userAgent.toLowerCase().contains("windows")) {
+            return "Windows";
+        } else if (userAgent.toLowerCase().contains("mac")) {
+            return "Mac OS";
+        } else if (userAgent.toLowerCase().contains("linux")) {
+            return "Linux";
+        } else if (userAgent.toLowerCase().contains("android")) {
+            return "Android";
+        } else if (userAgent.toLowerCase().contains("iphone") || userAgent.toLowerCase().contains("ipad")) {
+            return "iOS";
+        } else {
+            return "Unknown";
+        }
+    }
 }
