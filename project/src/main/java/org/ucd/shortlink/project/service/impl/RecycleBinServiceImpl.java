@@ -11,12 +11,13 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkMapper;
+import org.ucd.shortlink.project.dto.req.RecycleBinRecoverReqDTO;
 import org.ucd.shortlink.project.dto.req.RecycleBinSaveReqDTO;
-import org.ucd.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import org.ucd.shortlink.project.service.RecycleBinService;
 
+import static org.ucd.shortlink.project.common.constant.RedisKeyConstant.REDIRECT_IS_BLANK_SHORT_LINK_KEY;
 import static org.ucd.shortlink.project.common.constant.RedisKeyConstant.REDIRECT_SHORT_LINK_KEY;
 
 /**
@@ -59,5 +60,23 @@ public class RecycleBinServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLin
             result.setDomain("http://" + result.getDomain());
             return result;
         });
+    }
+
+    @Override
+    public void recoverRecycleBin(RecycleBinRecoverReqDTO requestParam) {
+        LambdaUpdateWrapper<ShortLinkDO> updateWrapper =
+                Wrappers.lambdaUpdate(ShortLinkDO.class)
+                        .eq(ShortLinkDO::getFullShortUrl, requestParam.getFullShortUrl())
+                        .eq(ShortLinkDO::getGid, requestParam.getGid())
+                        .eq(ShortLinkDO::getEnableStatus, 1)
+                        .eq(ShortLinkDO::getDelFlag, 0);
+        ShortLinkDO updateShortLink = ShortLinkDO.builder()
+                .enableStatus(0)
+                .build();
+        baseMapper.update(updateShortLink, updateWrapper);
+
+        // Remove original Blank dash occupation out from the Cache
+        stringRedisTemplate.delete(String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY,
+                requestParam.getFullShortUrl()));
     }
 }
