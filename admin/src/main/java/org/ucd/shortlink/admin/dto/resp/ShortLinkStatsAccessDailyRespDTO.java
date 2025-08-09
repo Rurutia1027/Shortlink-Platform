@@ -1,12 +1,10 @@
-package org.ucd.shortlink.project.dto.resp;
+package org.ucd.shortlink.admin.dto.resp;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 /**
  * Short link daily metric statistics

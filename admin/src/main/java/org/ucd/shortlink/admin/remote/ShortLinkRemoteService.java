@@ -1,5 +1,6 @@
 package org.ucd.shortlink.admin.remote;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;
@@ -8,7 +9,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.ucd.shortlink.admin.common.convention.result.Result;
+import org.ucd.shortlink.admin.dto.req.ShortLinkStatsReqDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
+import org.ucd.shortlink.admin.dto.resp.ShortLinkStatsRespDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRemoveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
@@ -156,5 +159,17 @@ public interface ShortLinkRemoteService {
     default void removeRecycleBin(RecycleBinRemoveReqDTO requestParam) {
         HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/recycle-bin/remove",
                 JSON.toJSONString(requestParam));
+    }
+
+    /**
+     * Single short link redirection monitor metric records in given start/end date range.
+     *
+     * @param requestParam short link stats monitor metrics
+     * @return monitor statistic records
+     */
+    default Result<ShortLinkStatsRespDTO> oneShortLinkStats(ShortLinkStatsReqDTO requestParam) {
+        String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats", BeanUtil.beanToMap(requestParam));
+        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
+        });
     }
 }
