@@ -6,7 +6,7 @@ import org.ucd.shortlink.project.dto.resp.ShortLinkStatsRespDTO;
 /**
  * Short link monitor interface layer
  */
-public interface ShortlinkStatsService {
+public interface ShortLinkStatsService {
     /**
      * Fetch single short link monitor metrics
      *

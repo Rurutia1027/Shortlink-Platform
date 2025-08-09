@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.project.common.convention.result.Result;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkStatsRespDTO;
-import org.ucd.shortlink.project.service.ShortlinkStatsService;
+import org.ucd.shortlink.project.service.ShortLinkStatsService;
 
 /**
  * Short link monitor metrics controller
@@ -14,7 +14,7 @@ import org.ucd.shortlink.project.service.ShortlinkStatsService;
 @RestController
 @RequiredArgsConstructor
 public class ShortLinkStatsController {
-    private final ShortlinkStatsService shortlinkStatsService;
+    private final ShortLinkStatsService shortlinkStatsService;
 
     /**
      * Short link item monitor metrics
