@@ -39,6 +39,7 @@ import org.ucd.shortlink.project.common.enums.ValiDateTypeEnum;
 import org.ucd.shortlink.project.dao.entity.LinkAccessLogsDO;
 import org.ucd.shortlink.project.dao.entity.LinkAccessStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkBrowserStatsDO;
+import org.ucd.shortlink.project.dao.entity.LinkDeviceStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkLocaleStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkOsStatsDO;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
@@ -46,6 +47,7 @@ import org.ucd.shortlink.project.dao.entity.ShortLinkRouteDO;
 import org.ucd.shortlink.project.dao.mapper.LinkAccessLogsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkAccessStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkBrowserStatsMapper;
+import org.ucd.shortlink.project.dao.mapper.LinkDeviceStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkOsStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkMapper;
@@ -93,6 +95,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkOsStatsMapper linkOsStatsMapper;
     private final LinkBrowserStatsMapper linkBrowserStatsMapper;
     private final LinkAccessLogsMapper linkAccessLogsMapper;
+    private final LinkDeviceStatsMapper linkDeviceStatsMapper;
 
 
     @Value("${short-link.stats.locale.amap-key}")
@@ -461,6 +464,14 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .fullShortUrl(fullShortUrl)
                         .build();
                 linkAccessLogsMapper.insert(linkAccessLogsDO);
+                LinkDeviceStatsDO linkDeviceStatsDO = LinkDeviceStatsDO.builder()
+                        .device(LinkUtil.getDevice(request))
+                        .cnt(1)
+                        .gid(gid)
+                        .fullShortUrl(fullShortUrl)
+                        .date(new Date())
+                        .build();
+                linkDeviceStatsMapper.insert(linkDeviceStatsDO);
             }
         } catch (Throwable ex) {
             log.error("Short link request statistic error!", ex);
