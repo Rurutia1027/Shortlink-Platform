@@ -10,14 +10,15 @@ import org.ucd.shortlink.project.common.database.BaseDO;
 import java.util.Date;
 
 /**
- * Short link access device stats
+ * Short link network stats entity
  */
 @Data
-@TableName("t_link_device_stats")
+@TableName("t_link_network_stats")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LinkDeviceStatsDO extends BaseDO {
+public class LinkNetworkStatsDO extends BaseDO {
+
     /**
      * id
      */
@@ -29,7 +30,7 @@ public class LinkDeviceStatsDO extends BaseDO {
     private String fullShortUrl;
 
     /**
-     * Group ID
+     * group ID
      */
     private String gid;
 
@@ -44,7 +45,7 @@ public class LinkDeviceStatsDO extends BaseDO {
     private Integer cnt;
 
     /**
-     * Device
+     * Access network
      */
-    private String device;
+    private String network;
 }

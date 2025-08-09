@@ -41,6 +41,7 @@ import org.ucd.shortlink.project.dao.entity.LinkAccessStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkBrowserStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkDeviceStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkLocaleStatsDO;
+import org.ucd.shortlink.project.dao.entity.LinkNetworkStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkOsStatsDO;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
 import org.ucd.shortlink.project.dao.entity.ShortLinkRouteDO;
@@ -472,6 +473,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .date(new Date())
                         .build();
                 linkDeviceStatsMapper.insert(linkDeviceStatsDO);
+
+                LinkNetworkStatsDO linkNetworkStatsDO = LinkNetworkStatsDO.builder()
+                        .network(LinkUtil.getNetwork(((HttpServletRequest) request)))
+                        .cnt(1)
+                        .gid(gid)
+                        .fullShortUrl(fullShortUrl)
+                        .date(new Date())
+                        .build();
+                linkNetworkStatsMapper.shortLinkNetworkState(linkNetworkStatsDO);
             }
         } catch (Throwable ex) {
             log.error("Short link request statistic error!", ex);
