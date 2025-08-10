@@ -1,55 +1,81 @@
-import http from '../axios.js'
+import http from '../axios'
 
 export default {
-    // register
-    addUser(data) {
+    queryPage(data) {
         return http({
-            url: '/user',
+            url: '/page',
+            metohd: 'get',
+            params: data
+        })
+    },
+
+    addSmallLink(data) {
+        return http({
+            url: '/create',
             method: 'post',
-            data
+            params: data
         })
     },
 
-    // edit info
-    editUser(data) {
+    editSmallLink(data) {
         return http({
-            url: '/user',
-            method: 'put',
-            data
-        })
-    },
-
-    // login
-    login(data) {
-        return http({
-            url: '/user/login',
+            url: '/update',
             method: 'post',
-            data
+            params: data
         })
     },
 
-    // logout
-    logout(data) {
+    // query title via short link
+    queryTitle(data) {
         return http({
-            url: '/user/logout?token=' + data.token + '&username=' + data.username,
-            method: 'delete'
-        })
-    },
-
-    // validate username available
-    isUsernameAvailable(data) {
-        return http({
-            url: '/user/is-username-available',
+            url: '/title',
             method: 'get',
             params: data
         })
     },
 
-    // find user profile via username
-    queryUserInfo(data) {
+    // move enabled short link to recycle-bin
+    toRecycleBin(data) {
         return http({
-            url: '/actual/user/' + data,
-            method: 'get'
+            url: '/recycle-bin/page',
+            method: 'get',
+            params: data
+        })
+    },
+
+    // query short link(s) from recycle-bin
+    queryRecycleBin(data) {
+        return http({
+            url: '/recycle-bin/page',
+            method: 'get',
+            params: data
+        })
+    },
+
+    // recover recycled short link
+    recoverLink(data) {
+        return http({
+            url: '/recycle-bin/recover',
+            method: 'post',
+            params: data
+        })
+    },
+
+    // remove link
+    removeLink(data) {
+        return http({
+            url: '/recycle-bin/remove',
+            method: 'post',
+            params: data
+        })
+    },
+
+    // query link monitor metric stats
+    queryLinkStats(data) {
+        return http({
+            url: '/stats',
+            method: 'get',
+            params: data
         })
     }
 }
