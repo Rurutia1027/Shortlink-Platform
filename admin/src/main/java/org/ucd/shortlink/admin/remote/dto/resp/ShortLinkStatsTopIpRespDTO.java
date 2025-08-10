@@ -1,4 +1,4 @@
-package org.ucd.shortlink.admin.dto.resp;
+package org.ucd.shortlink.admin.remote.dto.resp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,25 +6,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Short link OS metrics response body
+ * High frequency access IP monitor state response body
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortLinkStatsOsRespDTO {
+public class ShortLinkStatsTopIpRespDTO {
     /**
      * Total cnt
      */
     private Integer cnt;
 
     /**
-     * OS info
+     * IP
      */
-    private String os;
-
-    /**
-     * Ratio of current os / total os
-     */
-    private Double ratio;
+    private String ip;
 }

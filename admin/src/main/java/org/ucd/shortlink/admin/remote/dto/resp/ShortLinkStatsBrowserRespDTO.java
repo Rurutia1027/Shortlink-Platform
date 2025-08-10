@@ -1,4 +1,4 @@
-package org.ucd.shortlink.admin.dto.resp;
+package org.ucd.shortlink.admin.remote.dto.resp;
 
 
 import lombok.AllArgsConstructor;

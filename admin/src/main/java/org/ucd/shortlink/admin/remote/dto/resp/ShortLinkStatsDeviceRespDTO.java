@@ -1,4 +1,4 @@
-package org.ucd.shortlink.admin.dto.resp;
+package org.ucd.shortlink.admin.remote.dto.resp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,26 +6,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Short link access network metric stats response bod
+ * Short link device monitor stats response body
  */
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortLinkStatsNetworkRespDTO {
+public class ShortLinkStatsDeviceRespDTO {
     /**
      * Total cnt
      */
     private Integer cnt;
 
     /**
-     * Network info
+     * Device type
      */
-    private String network;
+    private String device;
 
     /**
-     * Ration of current network cnt / total network cnt
+     * Ration of current device / total device
      */
     private Double ratio;
 }

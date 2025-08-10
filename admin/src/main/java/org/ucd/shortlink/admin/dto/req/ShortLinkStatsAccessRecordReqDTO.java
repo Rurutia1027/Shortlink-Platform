@@ -1,16 +1,18 @@
 package org.ucd.shortlink.admin.dto.req;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
 
 /**
- * Short link monitor metrics object
+ * Short link monitor record request param
  */
 @Data
-public class ShortLinkStatsReqDTO {
+public class ShortLinkStatsAccessRecordReqDTO extends Page {
+
     /**
      * Full short link
      */
-    private String fullShortLink;
+    private String fullShortUrl;
 
     /**
      * Group ID
@@ -18,12 +20,12 @@ public class ShortLinkStatsReqDTO {
     private String gid;
 
     /**
-     * Monitor metrics Query Start Date
+     * Start date
      */
     private String startDate;
 
     /**
-     * Monitor metrics Query End Date
+     * End date
      */
     private String endDate;
 }

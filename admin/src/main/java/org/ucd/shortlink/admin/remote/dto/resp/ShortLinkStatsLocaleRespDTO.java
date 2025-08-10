@@ -1,4 +1,4 @@
-package org.ucd.shortlink.admin.dto.resp;
+package org.ucd.shortlink.admin.remote.dto.resp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,25 +6,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Short link device monitor stats response body
+ * Short link monitor region info response body
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortLinkStatsDeviceRespDTO {
+public class ShortLinkStatsLocaleRespDTO {
     /**
      * Total cnt
      */
     private Integer cnt;
 
     /**
-     * Device type
+     * Region info
      */
-    private String device;
+    private String locale;
 
     /**
-     * Ration of current device / total device
+     * Ration of current region / total region
      */
     private Double ratio;
 }
