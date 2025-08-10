@@ -43,12 +43,27 @@ public class LinkAccessLogsDO extends BaseDO {
     private String browser;
 
     /**
-     * Device info
+     * Os info
      */
-    private String device;
+    private String os;
 
     /**
      * ip
      */
     private String ip;
+
+    /**
+     * Network
+     */
+    private String network;
+
+    /**
+     * Device
+     */
+    private String device;
+
+    /**
+     * Region
+     */
+    private String locale;
 }
