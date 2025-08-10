@@ -1,4 +1,6 @@
 import {createRouter, createWebHistory} from "vue-router";
+import {getToken, setToken, setUsername} from '@/core/auth.js'
+import {isNotEmpty} from '@/utils/plugins'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +41,12 @@ const router = createRouter({
                         meta: {title: 'Profile'}
                     }
                 ]
+        },
+        {
+            path: '/test',
+            name: 'TestPage',
+            component: () => import('@/views/TestPage.vue'),
+            meta: {title: 'Test Page'}
         }
     ]
 })
@@ -50,12 +58,12 @@ router.beforeEach(async (to, from, next) => {
     setUsername(localStorage.getItem('username'))
     const token = getToken()
     if (to.path === '/login') {
-        next()
+        return next()
     }
     if (isNotEmpty(token)) {
-        next()
+        return next()
     } else {
-        next('/login')
+        return next('/login')
     }
 })
 

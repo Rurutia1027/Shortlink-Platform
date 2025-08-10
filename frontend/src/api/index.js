@@ -1,10 +1,13 @@
-const req = import.meta.globEager('./modules/*.js')
+const modules = import.meta.glob('./modules/*.js')
 const api = {}
-for (const key in req) {
-    const name = key.replace(/^\.\/modules\/(.*)\.\w+$/, '$1') // 取文件名
-    const value = req[key] // 取文件的内容
-    api[name] = value.default // 赋值
-}
-const API = api
 
-export default API
+async function loadModules() {
+    for (const path in modules) {
+        const mod = await modules[path]()
+        const name = path.replace(/^\.\/modules\/(.*)\.\w+$/, '$1')
+        api[name] = mod.default
+    }
+}
+await loadModules()
+
+export default api
