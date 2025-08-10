@@ -1,4 +1,6 @@
+<template>
 
+</template>
 <style lang="scss" scoped>
 .flex-box {
   display: flex;
