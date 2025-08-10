@@ -500,6 +500,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .date(new Date())
                         .build();
                 linkStatsTodayMapper.shortLinkTodayState(linkStatsTodayDO);
+            }
         } catch (Throwable ex) {
             log.error("Short link request statistic error!", ex);
         }
