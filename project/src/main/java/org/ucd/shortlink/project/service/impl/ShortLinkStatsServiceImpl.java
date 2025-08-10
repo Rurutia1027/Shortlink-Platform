@@ -38,6 +38,7 @@ import org.ucd.shortlink.project.dao.mapper.LinkDeviceStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkNetworkStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkOsStatsMapper;
+import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
@@ -318,172 +319,32 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
     }
 
     @Override
-    public ShortLinkStatsRespDTO groupShortLinkStats(ShortLinkGroupStatsReqDTO requestParam) {
-        List<LinkAccessStatsDO> listStatsByGroup = linkAccessStatsMapper.listStatsByGroup(requestParam);
-        if (CollUtil.isEmpty(listStatsByGroup)) {
-            return null;
-        }
-        // Fetch basic monitor statistics
-        LinkAccessStatsDO pvUvUidStatsByGroup = linkAccessLogsMapper.findPvUvUidStatsByGroup(requestParam);
-        List<ShortLinkStatsAccessDailyRespDTO> daily = new ArrayList<>();
-        List<String> rangeDates = DateUtil.rangeToList(DateUtil.parse(requestParam.getStartDate()), DateUtil.parse(requestParam.getEndDate()), DateField.DAY_OF_MONTH).stream()
-                .map(DateUtil::formatDate)
+    public IPage<ShortLinkStatsAccessRecordRespDTO> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        LambdaQueryWrapper<LinkAccessLogsDO> queryWrapper = Wrappers.lambdaQuery(LinkAccessLogsDO.class)
+                .eq(LinkAccessLogsDO::getGid, requestParam.getGid())
+                .between(LinkAccessLogsDO::getCreateTime, requestParam.getStartDate(), requestParam.getEndDate())
+                .eq(LinkAccessLogsDO::getDelFlag, 0)
+                .orderByDesc(LinkAccessLogsDO::getCreateTime);
+        IPage<LinkAccessLogsDO> linkAccessLogsDOIPage = linkAccessLogsMapper.selectPage(requestParam, queryWrapper);
+        IPage<ShortLinkStatsAccessRecordRespDTO> actualResult = linkAccessLogsDOIPage.convert(each -> BeanUtil.toBean(each, ShortLinkStatsAccessRecordRespDTO.class));
+        List<String> userAccessLogsList = actualResult.getRecords().stream()
+                .map(ShortLinkStatsAccessRecordRespDTO::getUser)
                 .toList();
-        rangeDates.forEach(each -> listStatsByGroup.stream()
-                .filter(item -> Objects.equals(each, DateUtil.formatDate(item.getDate())))
-                .findFirst()
-                .ifPresentOrElse(item -> {
-                    ShortLinkStatsAccessDailyRespDTO accessDailyRespDTO = ShortLinkStatsAccessDailyRespDTO.builder()
-                            .date(each)
-                            .pv(item.getPv())
-                            .uv(item.getUv())
-                            .uip(item.getUip())
-                            .build();
-                    daily.add(accessDailyRespDTO);
-                }, () -> {
-                    ShortLinkStatsAccessDailyRespDTO accessDailyRespDTO = ShortLinkStatsAccessDailyRespDTO.builder()
-                            .date(each)
-                            .pv(0)
-                            .uv(0)
-                            .uip(0)
-                            .build();
-                    daily.add(accessDailyRespDTO);
-                }));
-
-        // Fetch region monitor statistic records
-        List<ShortLinkStatsLocaleRespDTO> localeStats = new ArrayList<>();
-        List<LinkLocaleStatsDO> listedLocaleByGroup = linkLocaleStatsMapper.listLocaleByGroup(requestParam);
-        int localeCnSum = listedLocaleByGroup.stream()
-                .mapToInt(LinkLocaleStatsDO::getCnt)
-                .sum();
-        listedLocaleByGroup.forEach(each -> {
-            double ratio = (double) each.getCnt() / localeCnSum;
-            double actualRatio = Math.round(ratio * 100.0) / 100.0;
-            ShortLinkStatsLocaleRespDTO localeCNRespDTO = ShortLinkStatsLocaleRespDTO.builder()
-                    .cnt(each.getCnt())
-                    .locale(each.getProvince())
-                    .ratio(actualRatio)
-                    .build();
-            localeStats.add(localeCNRespDTO);
-        });
-
-        // Hourly access monitor statistics
-        List<Integer> hourStats = new ArrayList<>();
-        List<LinkAccessStatsDO> listHourStatsByGroup = linkAccessStatsMapper.listHourStatsByGroup(requestParam);
-        for (int i = 0; i < 24; i++) {
-            AtomicInteger hour = new AtomicInteger(i);
-            int hourCnt = listHourStatsByGroup.stream()
-                    .filter(each -> Objects.equals(each.getHour(), hour.get()))
+        List<Map<String, Object>> uvTypeList = linkAccessLogsMapper.selectGroupUvTypeByUsers(
+                requestParam.getGid(),
+                requestParam.getStartDate(),
+                requestParam.getEndDate(),
+                userAccessLogsList
+        );
+        actualResult.getRecords().forEach(each -> {
+            String uvType = uvTypeList.stream()
+                    .filter(item -> Objects.equals(each.getUser(), item.get("user")))
                     .findFirst()
-                    .map(LinkAccessStatsDO::getPv)
-                    .orElse(0);
-            hourStats.add(hourCnt);
-        }
-
-        // High frequency IP access records
-        List<ShortLinkStatsTopIpRespDTO> topIpStats = new ArrayList<>();
-        List<HashMap<String, Object>> listTopIpByGroup = linkAccessLogsMapper.listTopIpByGroup(requestParam);
-        listTopIpByGroup.forEach(each -> {
-            ShortLinkStatsTopIpRespDTO statsTopIpRespDTO = ShortLinkStatsTopIpRespDTO.builder()
-                    .ip(each.get("ip").toString())
-                    .cnt(Integer.parseInt(each.get("count").toString()))
-                    .build();
-            topIpStats.add(statsTopIpRespDTO);
+                    .map(item -> item.get("UvType"))
+                    .map(Object::toString)
+                    .orElse("Old Visitor");
+            each.setUvType(uvType);
         });
-
-        // Weekly access records
-        List<Integer> weekdayStats = new ArrayList<>();
-        List<LinkAccessStatsDO> listWeekdayStatsByGroup = linkAccessStatsMapper.listWeekdayStatsByGroup(requestParam);
-        for (int i = 1; i < 8; i++) {
-            AtomicInteger weekday = new AtomicInteger(i);
-            int weekdayCnt = listWeekdayStatsByGroup.stream()
-                    .filter(each -> Objects.equals(each.getWeekday(), weekday.get()))
-                    .findFirst()
-                    .map(LinkAccessStatsDO::getPv)
-                    .orElse(0);
-            weekdayStats.add(weekdayCnt);
-        }
-
-        // Browser access stats
-        List<ShortLinkStatsBrowserRespDTO> browserStats = new ArrayList<>();
-        List<HashMap<String, Object>> listBrowserStatsByGroup = linkBrowserStatsMapper.listBrowserStatsByGroup(requestParam);
-        int browserSum = listBrowserStatsByGroup.stream()
-                .mapToInt(each -> Integer.parseInt(each.get("count").toString()))
-                .sum();
-        listBrowserStatsByGroup.forEach(each -> {
-            double ratio = (double) Integer.parseInt(each.get("count").toString()) / browserSum;
-            double actualRatio = Math.round(ratio * 100.0) / 100.0;
-            ShortLinkStatsBrowserRespDTO browserRespDTO = ShortLinkStatsBrowserRespDTO.builder()
-                    .cnt(Integer.parseInt(each.get("count").toString()))
-                    .browser(each.get("browser").toString())
-                    .ratio(actualRatio)
-                    .build();
-            browserStats.add(browserRespDTO);
-        });
-
-        // OS access stats
-        List<ShortLinkStatsOsRespDTO> osStats = new ArrayList<>();
-        List<HashMap<String, Object>> listOsStatsByGroup = linkOsStatsMapper.listOsStatsByGroup(requestParam);
-        int osSum = listOsStatsByGroup.stream()
-                .mapToInt(each -> Integer.parseInt(each.get("count").toString()))
-                .sum();
-        listOsStatsByGroup.forEach(each -> {
-            double ratio = (double) Integer.parseInt(each.get("count").toString()) / osSum;
-            double actualRatio = Math.round(ratio * 100.0) / 100.0;
-            ShortLinkStatsOsRespDTO osRespDTO = ShortLinkStatsOsRespDTO.builder()
-                    .cnt(Integer.parseInt(each.get("count").toString()))
-                    .os(each.get("os").toString())
-                    .ratio(actualRatio)
-                    .build();
-            osStats.add(osRespDTO);
-        });
-
-        // Device access stats
-        List<ShortLinkStatsDeviceRespDTO> deviceStats = new ArrayList<>();
-        List<LinkDeviceStatsDO> listDeviceStatsByGroup = linkDeviceStatsMapper.listDeviceStatsByGroup(requestParam);
-        int deviceSum = listDeviceStatsByGroup.stream()
-                .mapToInt(LinkDeviceStatsDO::getCnt)
-                .sum();
-        listDeviceStatsByGroup.forEach(each -> {
-            double ratio = (double) each.getCnt() / deviceSum;
-            double actualRatio = Math.round(ratio * 100.0) / 100.0;
-            ShortLinkStatsDeviceRespDTO deviceRespDTO = ShortLinkStatsDeviceRespDTO.builder()
-                    .cnt(each.getCnt())
-                    .device(each.getDevice())
-                    .ratio(actualRatio)
-                    .build();
-            deviceStats.add(deviceRespDTO);
-        });
-
-        // Network access stats
-        List<ShortLinkStatsNetworkRespDTO> networkStats = new ArrayList<>();
-        List<LinkNetworkStatsDO> listNetworkStatsByGroup = linkNetworkStatsMapper.listNetworkStatsByGroup(requestParam);
-        int networkSum = listNetworkStatsByGroup.stream()
-                .mapToInt(LinkNetworkStatsDO::getCnt)
-                .sum();
-        listNetworkStatsByGroup.forEach(each -> {
-            double ratio = (double) each.getCnt() / networkSum;
-            double actualRatio = Math.round(ratio * 100.0) / 100.0;
-            ShortLinkStatsNetworkRespDTO networkRespDTO = ShortLinkStatsNetworkRespDTO.builder()
-                    .cnt(each.getCnt())
-                    .network(each.getNetwork())
-                    .ratio(actualRatio)
-                    .build();
-            networkStats.add(networkRespDTO);
-        });
-        return ShortLinkStatsRespDTO.builder()
-                .pv(pvUvUidStatsByGroup.getPv())
-                .uv(pvUvUidStatsByGroup.getUv())
-                .uip(pvUvUidStatsByGroup.getUip())
-                .daily(daily)
-                .localeStats(localeStats)
-                .hourStats(hourStats)
-                .topIpStats(topIpStats)
-                .weekdayStats(weekdayStats)
-                .browserStats(browserStats)
-                .osStats(osStats)
-                .deviceStats(deviceStats)
-                .networkStats(networkStats)
-                .build();
+        return actualResult;
     }
 }

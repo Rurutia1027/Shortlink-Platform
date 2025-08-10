@@ -17,13 +17,15 @@
 
 package org.ucd.shortlink.project.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.project.common.convention.result.Result;
 import org.ucd.shortlink.project.common.convention.result.Results;
-import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsReqDTO;
+import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkStatsAccessRecordRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkStatsRespDTO;
 import org.ucd.shortlink.project.service.ShortLinkStatsService;
 
@@ -46,8 +48,8 @@ public class ShortLinkStatsController {
     /**
      * Fetch grouping short link monitor metrics
      */
-    @GetMapping("/api/short-link/v1/stats/group")
-    public Result<ShortLinkStatsRespDTO> groupShortLinkStats(ShortLinkGroupStatsReqDTO requestParam) {
-        return Results.success(shortLinkStatsService.groupShortLinkStats(requestParam));
+    @GetMapping("/api/short-link/v1/stats/access-record/group")
+    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        return Results.success(shortLinkStatsService.groupShortLinkStatsAccessRecord(requestParam));
     }
 }

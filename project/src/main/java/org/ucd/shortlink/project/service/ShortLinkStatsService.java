@@ -18,7 +18,7 @@
 package org.ucd.shortlink.project.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsReqDTO;
+import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkStatsAccessRecordRespDTO;
@@ -51,5 +51,5 @@ public interface ShortLinkStatsService {
      * @param requestParam short link group metric records request
      * @return grouping short link group metric record response
      */
-    ShortLinkStatsRespDTO groupShortLinkStats(ShortLinkGroupStatsReqDTO requestParam);
+    IPage<ShortLinkStatsAccessRecordRespDTO> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam);
 }

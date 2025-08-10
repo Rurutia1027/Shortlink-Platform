@@ -32,6 +32,7 @@ import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRemoveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkStatsReqDTO;
@@ -216,6 +217,21 @@ public interface ShortLinkRemoteService {
      */
     default Result<ShortLinkStatsRespDTO> groupShortLinkStats(ShortLinkGroupStatsReqDTO requestParam) {
         String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats/group", BeanUtil.beanToMap(requestParam));
+        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * Fetch grouped short link monitor records
+     *
+     * @param requestParam request param
+     * @return grouped short link monitor records
+     */
+    default Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        Map<String, Object> stringObjectMap = BeanUtil.beanToMap(requestParam, false, true);
+        stringObjectMap.remove("orders");
+        stringObjectMap.remove("records");
+        String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats/access-record/group", stringObjectMap);
         return JSON.parseObject(resultBodyStr, new TypeReference<>() {
         });
     }

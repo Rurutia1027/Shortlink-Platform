@@ -156,4 +156,35 @@ public interface LinkAccessLogsMapper extends BaseMapper<LinkAccessLogsDO> {
             "GROUP BY " +
             "    gid;")
     LinkAccessStatsDO findPvUvUidStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
+
+
+    /**
+     * Fetch grouped old/new user monitor metrics
+     */
+    @Select("<script> " +
+            "SELECT " +
+            "    user, " +
+            "    CASE " +
+            "        WHEN MIN(create_time) BETWEEN #{startDate} AND #{endDate} THEN 'New " +
+            "Visitor' " +
+            "        ELSE 'Old Visitor' " +
+            "    END AS uvType " +
+            "FROM " +
+            "    t_link_access_logs " +
+            "WHERE " +
+            "    gid = #{gid} " +
+            "    AND user IN " +
+            "    <foreach item='item' index='index' collection='userAccessLogsList' open='(' separator=',' close=')'> " +
+            "        #{item} " +
+            "    </foreach> " +
+            "GROUP BY " +
+            "    user;" +
+            "    </script>"
+    )
+    List<Map<String, Object>> selectGroupUvTypeByUsers(
+            @Param("gid") String gid,
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate,
+            @Param("userAccessLogsList") List<String> userAccessLogsList
+    );
 }
