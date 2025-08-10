@@ -22,6 +22,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.ucd.shortlink.project.dao.entity.LinkDeviceStatsDO;
+import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 
 import java.util.List;
@@ -54,4 +55,19 @@ public interface LinkDeviceStatsMapper extends BaseMapper<LinkDeviceStatsDO> {
             "GROUP BY " +
             "    full_short_url, gid, device;")
     List<LinkDeviceStatsDO> listDeviceStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
+
+    /**
+     * Fetch grouped short link device monitor records
+     */
+    @Select("SELECT " +
+            "    device, " +
+            "    SUM(cnt) AS cnt " +
+            "FROM " +
+            "    t_link_device_stats " +
+            "WHERE " +
+            "    gid = #{param.gid} " +
+            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "GROUP BY " +
+            "    gid, device;")
+    List<LinkDeviceStatsDO> listDeviceStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 }

@@ -23,23 +23,24 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.ucd.shortlink.admin.common.convention.result.Result;
+import org.ucd.shortlink.admin.dto.req.ShortLinkGroupStatsReqDTO;
 import org.ucd.shortlink.admin.dto.req.ShortLinkStatsAccessRecordReqDTO;
-import org.ucd.shortlink.admin.remote.dto.req.ShortLinkStatsReqDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
-import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkStatsAccessRecordRespDTO;
-import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkStatsRespDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRemoveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkStatsReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
+import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkStatsAccessRecordRespDTO;
+import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkStatsRespDTO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +62,6 @@ public interface ShortLinkRemoteService {
         return JSON.parseObject(resultBodyStr, new TypeReference<>() {
         });
     }
-
 
     /**
      * Short link paging query
@@ -205,6 +205,33 @@ public interface ShortLinkRemoteService {
         stringObjectMap.remove("orders");
         stringObjectMap.remove("records");
         String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats/access-record", stringObjectMap);
+        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * Short link grouped monitor records
+     *
+     * @param requestParam grouped short link monitor metric request param
+     * @return grouped short link monitor records
+     */
+    default Result<ShortLinkStatsRespDTO> groupShortLinkStats(ShortLinkGroupStatsReqDTO requestParam) {
+        String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats/group", BeanUtil.beanToMap(requestParam));
+        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * Fetch grouped short link monitor records
+     *
+     * @param requestParam request param
+     * @return grouped short link monitor records
+     */
+    default Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        Map<String, Object> stringObjectMap = BeanUtil.beanToMap(requestParam, false, true);
+        stringObjectMap.remove("orders");
+        stringObjectMap.remove("records");
+        String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats/access-record/group", stringObjectMap);
         return JSON.parseObject(resultBodyStr, new TypeReference<>() {
         });
     }

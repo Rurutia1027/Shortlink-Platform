@@ -22,6 +22,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.ucd.shortlink.project.dao.entity.LinkLocaleStatsDO;
+import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 
 import java.util.List;
@@ -53,4 +54,19 @@ public interface LinkLocaleStatsMapper extends BaseMapper<LinkLocaleStatsDO> {
             "GROUP BY " +
             "    full_short_url, gid, province;")
     List<LinkLocaleStatsDO> listLocaleByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
+
+    /**
+     * Fetch grouped short link region monitor records
+     */
+    @Select("SELECT " +
+            "    province, " +
+            "    SUM(cnt) AS cnt " +
+            "FROM " +
+            "    t_link_locale_stats " +
+            "WHERE " +
+            "    gid = #{param.gid} " +
+            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "GROUP BY " +
+            "    gid, province;")
+    List<LinkLocaleStatsDO> listLocaleByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 }
