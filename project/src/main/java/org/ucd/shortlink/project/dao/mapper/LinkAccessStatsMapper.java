@@ -22,6 +22,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.ucd.shortlink.project.dao.entity.LinkAccessStatsDO;
+import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 
 import java.util.List;
@@ -88,4 +89,52 @@ public interface LinkAccessStatsMapper extends BaseMapper<LinkAccessStatsDO> {
             "GROUP BY " +
             "    full_short_url, gid, weekday;")
     List<LinkAccessStatsDO> listWeekdayStatsByShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
+
+
+    /**
+     * Fetch grouped short link monitor stats
+     */
+    @Select("SELECT " +
+            "    date, " +
+            "    SUM(pv) AS pv, " +
+            "    SUM(uv) AS uv, " +
+            "    SUM(uip) AS uip " +
+            "FROM " +
+            "    t_link_access_stats " +
+            "WHERE " +
+            "    gid = #{param.gid} " +
+            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "GROUP BY " +
+            "    gid, date;")
+    List<LinkAccessStatsDO> listStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
+
+    /**
+     * Fetch grouped hourly short link monitor stats
+     */
+    @Select("SELECT " +
+            "    hour, " +
+            "    SUM(pv) AS pv " +
+            "FROM " +
+            "    t_link_access_stats " +
+            "WHERE " +
+            "    gid = #{param.gid} " +
+            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "GROUP BY " +
+            "    gid, hour;")
+    List<LinkAccessStatsDO> listHourStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
+
+    /**
+     * Fetch grouped weekly short link monitor stats
+     */
+    @Select("SELECT " +
+            "    weekday, " +
+            "    SUM(pv) AS pv " +
+            "FROM " +
+            "    t_link_access_stats " +
+            "WHERE " +
+            "    gid = #{param.gid} " +
+            "    AND date BETWEEN #{param.startDate} and #{param.endDate} " +
+            "GROUP BY " +
+            "    gid, weekday;")
+    List<LinkAccessStatsDO> listWeekdayStatsByGroup(@Param("param") ShortLinkGroupStatsReqDTO requestParam);
 }
