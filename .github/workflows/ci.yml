@@ -72,7 +72,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # or whichever Node version you want to use
+          node-version: '22'  # or whichever Node version you want to use
 
       - name: Install frontend dependencies
         working-directory: frontend  # adjust if your frontend folder differs
