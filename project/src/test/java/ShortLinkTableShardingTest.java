@@ -1,11 +1,18 @@
 public class ShortLinkTableShardingTest {
-    public static final String SQL = "create table t_link_route_%d\n" +
-            "(\n" +
-            "    id             bigint auto_increment\n" +
-            "        primary key,\n" +
-            "    gid            varchar(32)  null,\n" +
-            "    full_short_url varchar(128) null\n" +
-            ");";
+    public static final String SQL = "CREATE TABLE `t_link_stats_today_%d` (\n" +
+            "  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',\n" +
+            "  `gid` varchar(32) DEFAULT 'default' COMMENT 'Group Identifier',\n" +
+            "  `full_short_url` varchar(128) DEFAULT NULL COMMENT 'Short URL',\n" +
+            "  `date` date DEFAULT NULL COMMENT 'Date',\n" +
+            "  `today_pv` int(11) DEFAULT '0' COMMENT 'Today Page Views',\n" +
+            "  `today_uv` int(11) DEFAULT '0' COMMENT 'Today Unique Visitors',\n" +
+            "  `today_ip_count` int(11) DEFAULT '0' COMMENT 'Today IP Count',\n" +
+            "  `create_time` datetime DEFAULT NULL COMMENT 'Creation Time',\n" +
+            "  `update_time` datetime DEFAULT NULL COMMENT 'Update Time',\n" +
+            "  `del_flag` tinyint(1) DEFAULT NULL COMMENT 'Deletion Flag 0: Not Deleted, 1: Deleted',\n" +
+            "  PRIMARY KEY (`id`),\n" +
+            "  UNIQUE KEY `idx_unique_today_stats` (`full_short_url`,`gid`,`date`) USING BTREE\n" +
+            ") ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;\n" ;
 
     public static final String SQL_T_GROUP = "create table t_group_%d\n" +
             "(\n" +

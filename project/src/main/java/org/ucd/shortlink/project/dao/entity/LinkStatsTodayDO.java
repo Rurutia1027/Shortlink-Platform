@@ -1,13 +1,20 @@
 package org.ucd.shortlink.project.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.ucd.shortlink.project.common.database.BaseDO;
 
 import java.util.Date;
 
 @TableName("t_link_stats_today")
 @Data
-public class LinkStatsTodayDO {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class LinkStatsTodayDO extends BaseDO {
     /**
      * ID
      */
@@ -37,4 +44,9 @@ public class LinkStatsTodayDO {
      * Today UV
      */
     private Integer todayUv;
+
+    /**
+     * Today Unique IP Cnt
+     */
+    private Integer todayUip;
 }

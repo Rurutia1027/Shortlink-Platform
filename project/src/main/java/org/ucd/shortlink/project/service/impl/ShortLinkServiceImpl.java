@@ -43,6 +43,7 @@ import org.ucd.shortlink.project.dao.entity.LinkDeviceStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkLocaleStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkNetworkStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkOsStatsDO;
+import org.ucd.shortlink.project.dao.entity.LinkStatsTodayDO;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
 import org.ucd.shortlink.project.dao.entity.ShortLinkRouteDO;
 import org.ucd.shortlink.project.dao.mapper.LinkAccessLogsMapper;
@@ -52,6 +53,7 @@ import org.ucd.shortlink.project.dao.mapper.LinkDeviceStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkNetworkStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkOsStatsMapper;
+import org.ucd.shortlink.project.dao.mapper.LinkStatsTodayMapper;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkRouteMapper;
 import org.ucd.shortlink.project.dto.req.ShortLinkCreateReqDTO;
@@ -99,6 +101,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkAccessLogsMapper linkAccessLogsMapper;
     private final LinkDeviceStatsMapper linkDeviceStatsMapper;
     private final LinkNetworkStatsMapper linkNetworkStatsMapper;
+    private final LinkStatsTodayMapper linkStatsTodayMapper;
 
 
     @Value("${short-link.stats.locale.amap-key}")
@@ -120,6 +123,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .favicon(getFavicon(requestParam.getOriginUrl()))
                 .shortUri(shortLinkSuffix)
                 .fullShortUrl(fullShortUrl)
+                .totalPv(0)
+                .totalUv(0)
+                .totalUip(0)
                 .enableStatus(0)
                 .build();
 
@@ -484,7 +490,16 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .date(new Date())
                         .build();
                 linkNetworkStatsMapper.shortLinkNetworkState(linkNetworkStatsDO);
-            }
+                baseMapper.incrementStats(gid, fullShortUrl, 1, uvFirstFlag.get() ? 1 : 0, uipFirstFlag ? 1 : 0);
+                LinkStatsTodayDO linkStatsTodayDO = LinkStatsTodayDO.builder()
+                        .todayPv(1)
+                        .todayUv(uvFirstFlag.get() ? 1 : 0)
+                        .todayUip(uipFirstFlag ? 1 : 0)
+                        .gid(gid)
+                        .fullShortUrl(fullShortUrl)
+                        .date(new Date())
+                        .build();
+                linkStatsTodayMapper.shortLinkTodayState(linkStatsTodayDO);
         } catch (Throwable ex) {
             log.error("Short link request statistic error!", ex);
         }
