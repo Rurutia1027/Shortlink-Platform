@@ -1,8 +1,32 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.ucd.shortlink.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.ucd.shortlink.project.dao.entity.LinkAccessLogsDO;
 import org.ucd.shortlink.project.dao.entity.LinkAccessStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkDeviceStatsDO;
 import org.ucd.shortlink.project.dao.entity.LinkLocaleStatsDO;
@@ -14,8 +38,10 @@ import org.ucd.shortlink.project.dao.mapper.LinkDeviceStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkNetworkStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkOsStatsMapper;
+import org.ucd.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkStatsAccessDailyRespDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkStatsAccessRecordRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkStatsBrowserRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkStatsDeviceRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkStatsLocaleRespDTO;
@@ -29,7 +55,9 @@ import org.ucd.shortlink.project.service.ShortLinkStatsService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -48,8 +76,41 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
 
     @Override
     public ShortLinkStatsRespDTO oneShortLinkStats(ShortLinkStatsReqDTO requestParam) {
-        // Basic short link access metrics
-        List<LinkAccessStatsDO> listStatsByShortLink = linkAccessStatsMapper.listStatsByShortLink(requestParam);
+        // Basic short link access metricss
+        List<LinkAccessStatsDO> listStatsByShortLink =
+                linkAccessStatsMapper.listStatsByShortLink(requestParam);
+        if (CollUtil.isEmpty(listStatsByShortLink)) {
+            return null;
+        }
+        List<ShortLinkStatsAccessDailyRespDTO> daily = new ArrayList<>();
+        List<String> rangeDates =
+                DateUtil.rangeToList(DateUtil.parse(requestParam.getStartDate()),
+                                DateUtil.parse(requestParam.getEndDate()), DateField.DAY_OF_MONTH).stream()
+                        .map(DateUtil::formatDate)
+                        .toList();
+        rangeDates.forEach(each -> listStatsByShortLink.stream()
+                .filter(item -> Objects.equals(each, DateUtil.formatDate(item.getDate())))
+                .findFirst()
+                .ifPresentOrElse(item -> {
+                    ShortLinkStatsAccessDailyRespDTO accessDailyRespDTO =
+                            ShortLinkStatsAccessDailyRespDTO.builder()
+                                    .date(each)
+                                    .pv(item.getPv())
+                                    .uv(item.getUv())
+                                    .uip(item.getUip())
+                                    .build();
+                    daily.add(accessDailyRespDTO);
+                }, () -> {
+                    ShortLinkStatsAccessDailyRespDTO accessDailyRespDTO =
+                            ShortLinkStatsAccessDailyRespDTO.builder()
+                                    .date(each)
+                                    .pv(0)
+                                    .uv(0)
+                                    .uip(0)
+                                    .build();
+                    daily.add(accessDailyRespDTO);
+                }));
+
         // Region short link access metrics
         List<ShortLinkStatsLocaleRespDTO> localeCnStats = new ArrayList<>();
         List<LinkLocaleStatsDO> listedLocaleByShortLink = linkLocaleStatsMapper.listLocaleByShortLink(requestParam);
@@ -136,8 +197,18 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
         // Visitor type monitor metrics
         List<ShortLinkStatsUvRespDTO> uvTypeStats = new ArrayList<>();
         HashMap<String, Object> findUvTypeByShortLink = linkAccessLogsMapper.findUvTypeCntByShortLink(requestParam);
-        int oldUserCnt = Integer.parseInt(findUvTypeByShortLink.get("oldUserCnt").toString());
-        int newUserCnt = Integer.parseInt(findUvTypeByShortLink.get("newUserCnt").toString());
+        int oldUserCnt = Integer.parseInt(
+                Optional.ofNullable(findUvTypeByShortLink)
+                        .map(each -> each.get("oldUserCnt"))
+                        .map(Object::toString)
+                        .orElse("0")
+        );
+        int newUserCnt = Integer.parseInt(
+                Optional.ofNullable(findUvTypeByShortLink)
+                        .map(each -> each.get("newUserCnt"))
+                        .map(Object::toString)
+                        .orElse("0")
+        );
         int uvSum = oldUserCnt + newUserCnt;
         double oldRatio = (double) oldUserCnt / uvSum;
         double actualOldRatio = Math.round(oldRatio * 100.0) / 100.0;
@@ -189,7 +260,7 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
             networkStats.add(networkRespDTO);
         });
         return ShortLinkStatsRespDTO.builder()
-                .daily(BeanUtil.copyToList(listStatsByShortLink, ShortLinkStatsAccessDailyRespDTO.class))
+                .daily(daily)
                 .localeStats(localeCnStats)
                 .hourStats(hourStats)
                 .topIpStats(topIpStats)
@@ -200,5 +271,43 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                 .deviceStats(deviceStats)
                 .networkStats(networkStats)
                 .build();
+    }
+
+    @Override
+    public IPage<ShortLinkStatsAccessRecordRespDTO> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
+        LambdaQueryWrapper<LinkAccessLogsDO> queryWrapper =
+                Wrappers.lambdaQuery(LinkAccessLogsDO.class)
+                        .eq(LinkAccessLogsDO::getGid, requestParam.getGid())
+                        .eq(LinkAccessLogsDO::getFullShortUrl, requestParam.getFullShortUrl())
+                        .between(LinkAccessLogsDO::getCreateTime,
+                                requestParam.getStartDate(), requestParam.getEndDate())
+                        .eq(LinkAccessLogsDO::getDelFlag, 0)
+                        .orderByDesc(LinkAccessLogsDO::getCreateTime);
+        IPage<LinkAccessLogsDO> linkAccessLogsDOIPage =
+                linkAccessLogsMapper.selectPage(requestParam, queryWrapper);
+        IPage<ShortLinkStatsAccessRecordRespDTO> actualResult =
+                linkAccessLogsDOIPage.convert(each -> BeanUtil.toBean(each,
+                        ShortLinkStatsAccessRecordRespDTO.class));
+        List<String> userAccessLogList = actualResult.getRecords().stream()
+                .map(ShortLinkStatsAccessRecordRespDTO::getUser)
+                .toList();
+        List<Map<String, Object>> uvTypeList = linkAccessLogsMapper.selectUvTypeByUsers(
+                requestParam.getGid(),
+                requestParam.getFullShortUrl(),
+                requestParam.getStartDate(),
+                requestParam.getEndDate(),
+                userAccessLogList
+        );
+        actualResult.getRecords().forEach(each -> {
+            String uvType = uvTypeList.stream()
+                    .filter(item -> Objects.equals(each.getUser(), item.get("user")))
+                    .findFirst()
+                    .map(item -> item.get("UvType"))
+                    .map(Object::toString)
+                    .orElse("Old Visitor");
+            each.setUvType(uvType);
+        });
+
+        return actualResult;
     }
 }
