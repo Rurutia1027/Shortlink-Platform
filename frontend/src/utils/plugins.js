@@ -8,7 +8,6 @@
 import {nextTick} from 'vue'
 
 export const transformRequireDynamic = function (code, id) {
-    // console.log(code)
     if (!/\/node_modules\//g.test(id)) return code
     const requireRegex = /_{2}require*\(\s*(["'].*["'])\s*\)/g
     const IMPORT_STRING_PREFIX = '__require_for_vite'

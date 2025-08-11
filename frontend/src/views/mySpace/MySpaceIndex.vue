@@ -1,5 +1,6 @@
 <template>
-
+  <div style="display: flex; height: 100%">
+  </div>
 </template>
 <style lang="scss" scoped>
 .flex-box {

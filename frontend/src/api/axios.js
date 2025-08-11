@@ -21,13 +21,14 @@ http.interceptors.request.use(
 
 http.interceptors.response.use(
     (res) => {
-        if (res.data.code = 'A000200') {
+        if (res.data.code = 'B000200') {
             localStorage.removeItem('token')
         }
 
         if (res.status == 0 || res.status == 200) {
             return Promise.resolve(res)
         }
+
         return Promise.reject(res)
     },
     (err) => {
