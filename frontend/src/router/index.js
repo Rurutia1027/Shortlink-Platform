@@ -7,7 +7,7 @@ const router = createRouter({
     routes: [
         {
             path: '/',
-            redirect: '/login'
+            redirect: '/home'
         },
         {
             path: '/login',
@@ -17,13 +17,13 @@ const router = createRouter({
         {
             path: '/home',
             name: 'LayoutIndex',
-            redirect: '/home/mySpace',
+            redirect: '/home/space',
             component: () => import('@/views/home/HomeIndex.vue'),
             children:
                 [
                     {
                         // no / needed
-                        path: 'mySpace',
+                        path: 'space',
                         name: 'MySpace',
                         component: () => import('@/views/mySpace/MySpaceIndex.vue'),
                         meta: {title: 'MySpace'}
@@ -35,18 +35,12 @@ const router = createRouter({
                         meta: {title: 'Account'}
                     },
                     {
-                        path: 'mine',
+                        path: 'account',
                         name: 'Mine',
                         component: () => import('@/views/mine/MineIndex.vue'),
                         meta: {title: 'Profile'}
                     }
                 ]
-        },
-        {
-            path: '/test',
-            name: 'TestPage',
-            component: () => import('@/views/TestPage.vue'),
-            meta: {title: 'Test Page'}
         }
     ]
 })
@@ -55,7 +49,9 @@ const router = createRouter({
 // eslint-disable-next-line no-unused-vars
 router.beforeEach(async (to, from, next) => {
     setToken(localStorage.getItem('token'))
+    console.log(localStorage.getItem('token'))
     setUsername(localStorage.getItem('username'))
+    console.log(localStorage.getItem('username'))
     const token = getToken()
     if (to.path === '/login') {
         return next()

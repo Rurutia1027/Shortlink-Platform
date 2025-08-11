@@ -82,7 +82,7 @@ const computedHeaders = ref([])
 
 function dealHeaders() {
   let headers = props.tableHeaders
-  computedHeaders.value = headers.map((headItem) => {¬
+  computedHeaders.value = headers.map((headItem) => {
     let fun = headItem.index
     if (headItem.type === 'index' && typeof fun === 'function') {
       headItem.index = (index) => fun(index, pageParams.value.pageNum, pageParams.value.pageSize)

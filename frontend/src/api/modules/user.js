@@ -37,9 +37,9 @@ export default {
     },
 
     // validate username available
-    isUsernameAvailable(data) {
+    hasUsername(data) {
         return http({
-            url: '/user/is-username-available',
+            url: '/user/has-username',
             method: 'get',
             params: data
         })

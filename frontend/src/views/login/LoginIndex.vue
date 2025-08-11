@@ -20,7 +20,7 @@
               </el-input>
             </el-form-item>
           </div>
-          <div class="btn-gourp">
+          <div class="btn-group">
             <div>
               <el-checkbox class="remember-password" v-model="checked" style="color: #a0a0a0; margin: 0 0 0px 0">
                 Remember Me
@@ -66,7 +66,7 @@
               <template v-slot:prepend>Password</template>
             </el-input>
           </el-form-item>
-          <div class="btn-gourp">
+          <div class="btn-group">
             <div></div>
             <div>
               <el-button :loading="loading" @keyup.enter="login" type="primary" plain @click="addUser(loginFormRef2)">
@@ -167,11 +167,13 @@ const addUser = (formEl) => {
       if (res1.data.success !== false) {
         // Register
         const res2 = await API.user.addUser(addForm)
+        console.log(res2.data.success)
         if (res2.data.success === false) {
           ElMessage.warning(res2.data.message)
         } else {
           const res3 = await API.user.login({username: addForm.username, password: addForm.password})
           const token = res3?.data?.data?.token
+          console.log("here we got token " + token)
           // Save username and token in cookies and localStorage
           if (token) {
             setToken(token)
@@ -298,7 +300,7 @@ const changeLogin = () => {
     margin-bottom: 23px;
   }
 
-  .btn-gourp {
+  .btn-group {
     margin-top: 30px;
     display: flex;
     justify-content: space-between;

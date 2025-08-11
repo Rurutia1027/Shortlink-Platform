@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
      * Intercept application internal exception handler
      */
     @ExceptionHandler(value = {AbstractException.class})
-    public Result abstactException(HttpServletRequest request, AbstractException ex) {
+    public Result abstractException(HttpServletRequest request, AbstractException ex) {
         if (ex.getCause() != null) {
             log.error("[{}] {} [ex] {} [cause] {}", request.getMethod(),
                     request.getRequestURL().toString(), ex, ex.getCause());

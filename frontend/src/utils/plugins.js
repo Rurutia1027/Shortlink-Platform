@@ -8,7 +8,6 @@
 import {nextTick} from 'vue'
 
 export const transformRequireDynamic = function (code, id) {
-    // console.log(code)
     if (!/\/node_modules\//g.test(id)) return code
     const requireRegex = /_{2}require*\(\s*(["'].*["'])\s*\)/g
     const IMPORT_STRING_PREFIX = '__require_for_vite'
@@ -156,14 +155,14 @@ export function moveToErr() {
 }
 
 // Return the last route segment from a path
-export function getLasteRoute(fullpath) {
+export function getLastRoute(fullpath) {
     const arr = fullpath.split('/')
     const length = arr.length
     return '/' + arr[length - 1]
 }
 
 // Get the current date in format YYYY-MM-DD
-export function getNowFormatDate() {
+export function getTodayFormatDate() {
     let date = new Date(),
         year = date.getFullYear(),
         month = date.getMonth() + 1,
@@ -174,7 +173,7 @@ export function getNowFormatDate() {
 }
 
 // Get the date one week from today in format YYYY-MM-DD
-export function getNextWeekFormatDate() {
+export function getLastWeekFormatDate() {
     let nextWeekDate = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
         year = nextWeekDate.getFullYear(),
         month = nextWeekDate.getMonth() + 1,
