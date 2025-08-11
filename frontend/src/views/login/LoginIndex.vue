@@ -199,7 +199,6 @@ const login = (formEl) => {
   formEl.validate(async (valid) => {
     if (valid) {
       const res1 = await API.user.login(loginForm)
-      console.log("response data: " +res1.data.code)
       if (res1.data.code === '0') {
         const token = res1?.data?.data?.token
         // Save username and token in cookies and localStorage

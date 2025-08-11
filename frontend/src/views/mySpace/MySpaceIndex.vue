@@ -1,7 +1,42 @@
 <template>
   <div style="display: flex; height: 100%">
+    <div class="options-box">
+      <div class="option-title flex-box">
+        <div>
+          Short Link Group <span> Total {{ editableTabs?.length }}}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+
+<!-- Page Variables -->
+<script setup>
+import {getCurrentInstance, ref} from "vue"
+
+
+const nums = ref(0)
+const favicon1 = ref()
+const originUrl1 = ref()
+const orderIndex = ref(0)
+const { proxy } = getCurrentInstance()
+const API = proxy.$API
+const chartsInfoRef = ref()
+const chartsInfo = ref()
+const tableInfo = ref()
+const createLink1Ref = ref()
+const createLink2Ref = ref()
+let selectedIndex = ref(0)
+const editableTabs = ref([])
+
+const afterAddLink = () => {
+
+}
+
+</script>
+
+<!-- CSS Styles -->
 <style lang="scss" scoped>
 .flex-box {
   display: flex;
