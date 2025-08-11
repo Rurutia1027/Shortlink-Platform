@@ -31,12 +31,14 @@ import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRemoveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkBatchCreateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkStatsReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
+import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkStatsAccessRecordRespDTO;
@@ -101,7 +103,6 @@ public interface ShortLinkRemoteService {
         });
     }
 
-
     /**
      * Update short link
      *
@@ -110,6 +111,18 @@ public interface ShortLinkRemoteService {
     default void updateShortLink(ShortLinkUpdateReqDTO requestParam) {
         HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/update",
                 JSON.toJSONString(requestParam));
+    }
+
+    /**
+     * Short link batch creation
+     *
+     * @param requestParam batch short link creation request param
+     * @return batch short link creation response param
+     */
+    default Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam) {
+        String resultBodyStr = HttpUtil.post("http://127.0.0.1:8001/api/short-link/v1/create/batch", JSON.toJSONString(requestParam));
+        return JSON.parseObject(resultBodyStr, new TypeReference<>() {
+        });
     }
 
     /**

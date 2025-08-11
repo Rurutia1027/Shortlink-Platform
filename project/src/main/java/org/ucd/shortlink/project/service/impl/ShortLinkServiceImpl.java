@@ -73,9 +73,12 @@ import org.ucd.shortlink.project.dao.mapper.LinkOsStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkStatsTodayMapper;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkRouteMapper;
+import org.ucd.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkBaseInfoRespDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
@@ -85,6 +88,7 @@ import org.ucd.shortlink.project.toolkit.LinkUtil;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -254,6 +258,38 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             baseMapper.delete(updateWrapper);
             baseMapper.insert(shortLinkDO);
         }
+    }
+
+    @Override
+    public ShortLinkBatchCreateRespDTO batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam) {
+        List<String> originUrls = requestParam.getOriginUrls();
+        List<String> describes = requestParam.getDescribes();
+        List<ShortLinkBaseInfoRespDTO> result = new ArrayList<>();
+        for (int i = 0; i < originUrls.size(); i++) {
+            ShortLinkCreateReqDTO shortLinkCreateReqDTO = BeanUtil.toBean(requestParam,
+                    ShortLinkCreateReqDTO.class);
+            shortLinkCreateReqDTO.setOriginUrl(originUrls.get(i));
+            shortLinkCreateReqDTO.setDescribe(describes.get(i));
+
+            try {
+                ShortLinkCreateRespDTO shortLink = this.createShortLink(shortLinkCreateReqDTO);
+                ShortLinkBaseInfoRespDTO linkBaseInfoRespDTO =
+                        ShortLinkBaseInfoRespDTO.builder()
+                                .fullShortUrl(shortLink.getFullShortUrl())
+                                .originUrl(shortLink.getOriginalUrl())
+                                .describe(describes.get(i))
+                                .build();
+                result.add(linkBaseInfoRespDTO);
+            } catch (Throwable ex) {
+                log.error("Batch create short link failure, request origin url {}",
+                        originUrls.get(i));
+            }
+        }
+
+        return ShortLinkBatchCreateRespDTO.builder()
+                .total(result.size())
+                .baseLinkInfos(result)
+                .build();
     }
 
     @SneakyThrows

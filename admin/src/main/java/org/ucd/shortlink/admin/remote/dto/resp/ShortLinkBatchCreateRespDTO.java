@@ -15,59 +15,30 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.dto.req;
+package org.ucd.shortlink.admin.remote.dto.resp;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.util.List;
 
 /**
- * Short link creation request object
+ * Short link batch create response object
  */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class ShortLinkCreateReqDTO {
+public class ShortLinkBatchCreateRespDTO {
     /**
-     * Domain name
+     * Create success cnt
      */
-    private String domain;
+    private Integer total;
 
     /**
-     * Original URL address
+     * Batch create response param
      */
-    private String originUrl;
-
-    /**
-     * Short Link Group ID
-     */
-    private String gid;
-
-    /**
-     * Short Link create type: 0: interface request, 1: console command request
-     */
-    private Integer createdType;
-
-    /**
-     * Validate Date Type: 0: permanent, 1: customize
-     */
-    private Integer validDateType;
-
-    /**
-     * Short link validate date range
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date validDate;
-
-
-    /**
-     * Description
-     */
-    private String describe;
+    private List<ShortLinkBaseInfoRespDTO> baseLinkInfos;
 }
