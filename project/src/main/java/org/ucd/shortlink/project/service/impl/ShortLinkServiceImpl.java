@@ -258,6 +258,17 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             baseMapper.delete(updateWrapper);
             baseMapper.insert(shortLinkDO);
         }
+
+        if (!Objects.equals(hasShortLinkDO.getValidDateType(), requestParam.getValidDateType())
+                || !Objects.equals(hasShortLinkDO.getValidDate(), requestParam.getValidDate())) {
+            stringRedisTemplate.delete(String.format(REDIRECT_SHORT_LINK_KEY, requestParam.getFullShortUrl()));
+            if (hasShortLinkDO.getValidDate() != null && hasShortLinkDO.getValidDate().before(new Date())) {
+                if (Objects.equals(requestParam.getValidDateType(),
+                        ValiDateTypeEnum.PERMANENT.getType()) || requestParam.getValidDate().after(new Date())) {
+                    stringRedisTemplate.delete(String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, requestParam.getFullShortUrl()));
+                }
+            }
+        }
     }
 
     @Override
@@ -295,8 +306,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     @SneakyThrows
     @Override
     public void restoreUrl(String shortUri, HttpServletRequest request, HttpServletResponse response) {
-        String fullShortUrl = request.getServerName() + "/" + shortUri;
-        String originalLink = stringRedisTemplate.opsForValue().get(String.format(REDIRECT_SHORT_LINK_KEY, fullShortUrl));
+        String serverName = request.getServerName();
         String serverPort = Optional.of(request.getServerPort())
                 .filter(each -> !Objects.equals(each, 80))
                 .map(String::valueOf)
@@ -304,6 +314,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .orElse("");
 
         // first cache query fetch original url address, directly redirect and exit
+        String fullShortUrl = serverName + serverPort + "/" + shortUri;
+        String originalLink = stringRedisTemplate.opsForValue().get(String.format(REDIRECT_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(originalLink)) {
             response.sendRedirect(originalLink);
             shortLinkStats(fullShortUrl, null, request, response);
@@ -389,7 +401,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             // continue executing redirection
             if (shortLinkDO == null || (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date()))) {
                 // if queried short link item already got expired, add a dash to cache occupy
-
                 stringRedisTemplate.opsForValue().set(
                             String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl),
                             "-",
