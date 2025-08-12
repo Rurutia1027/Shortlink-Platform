@@ -1,24 +1,30 @@
 version: '3.8'
 
 services:
-  # docker-compose up -d nacos
-  nacos:
-    image: nacos/nacos-server:latest
-    container_name: nacos
+  # docker-compose up -d  consul
+  consul:
+    image: hashicorp/consul:latest
+    container_name: consul
     ports:
-      - "8848:8848"
-    environment:
-      - MODE=standalone
-      - SPRING_DATASOURCE_PLATFORM=mysql
-      - MYSQL_SERVICE_HOST=mysql
-      - MYSQL_SERVICE_DB_NAME=link
-      - MYSQL_SERVICE_PORT=3306
-      - MYSQL_SERVICE_USER=admin
-      - MYSQL_SERVICE_PASSWORD=admin
-    volumes:
-      - ./nacos/logs:/home/nacos/logs
+      - "8500:8500"      # Consul UI & API Port
+      - "8600:8600/udp"  # Consul DNS  Port
+    command: "agent -dev -client=0.0.0.0"
     networks:
       - backend
+    restart: unless-stopped
+
+  # docker-compose up -d  envoy
+  envoy:
+    image: envoyproxy/envoy:v1.26.0
+    container_name: envoy
+    ports:
+      - "10000:10000"   # Ports that Envoy listens to, our services request can be sent through this port.
+    volumes:
+      - ./gateway/envoy.yaml:/etc/envoy/envoy.yaml:ro  # Envoy config YML file
+    networks:
+      - backend
+    depends_on:
+      - consul
     restart: unless-stopped
 
   mysql:
