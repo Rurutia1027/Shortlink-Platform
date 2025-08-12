@@ -30,9 +30,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.project.common.convention.result.Result;
 import org.ucd.shortlink.project.common.convention.result.Results;
+import org.ucd.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
@@ -73,6 +75,13 @@ public class ShortLinkController {
         return Results.success(shortLinkService.createShortLink(requestParam));
     }
 
+    /**
+     * Batch create short link
+     */
+    @PostMapping("/api/short-link/v1/create/batch")
+    public Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO requestParam) {
+        return Results.success(shortLinkService.batchCreateShortLink(requestParam));
+    }
 
     /**
      * Update Short Link

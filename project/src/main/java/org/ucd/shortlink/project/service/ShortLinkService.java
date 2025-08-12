@@ -24,9 +24,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
+import org.ucd.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
@@ -67,6 +69,15 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @param requestParam update short link request
      */
     void updateShortLink(ShortLinkUpdateReqDTO requestParam);
+
+
+    /**
+     * Batch create short link
+     *
+     * @param requestParam batch create short link request body
+     * @return batch create short link response body
+     */
+    ShortLinkBatchCreateRespDTO batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam);
 
     /**
      * Short link redirect

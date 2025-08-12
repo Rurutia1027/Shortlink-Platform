@@ -73,9 +73,12 @@ import org.ucd.shortlink.project.dao.mapper.LinkOsStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkStatsTodayMapper;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkRouteMapper;
+import org.ucd.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkBaseInfoRespDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
@@ -85,6 +88,7 @@ import org.ucd.shortlink.project.toolkit.LinkUtil;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -254,13 +258,55 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             baseMapper.delete(updateWrapper);
             baseMapper.insert(shortLinkDO);
         }
+
+        if (!Objects.equals(hasShortLinkDO.getValidDateType(), requestParam.getValidDateType())
+                || !Objects.equals(hasShortLinkDO.getValidDate(), requestParam.getValidDate())) {
+            stringRedisTemplate.delete(String.format(REDIRECT_SHORT_LINK_KEY, requestParam.getFullShortUrl()));
+            if (hasShortLinkDO.getValidDate() != null && hasShortLinkDO.getValidDate().before(new Date())) {
+                if (Objects.equals(requestParam.getValidDateType(),
+                        ValiDateTypeEnum.PERMANENT.getType()) || requestParam.getValidDate().after(new Date())) {
+                    stringRedisTemplate.delete(String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, requestParam.getFullShortUrl()));
+                }
+            }
+        }
+    }
+
+    @Override
+    public ShortLinkBatchCreateRespDTO batchCreateShortLink(ShortLinkBatchCreateReqDTO requestParam) {
+        List<String> originUrls = requestParam.getOriginUrls();
+        List<String> describes = requestParam.getDescribes();
+        List<ShortLinkBaseInfoRespDTO> result = new ArrayList<>();
+        for (int i = 0; i < originUrls.size(); i++) {
+            ShortLinkCreateReqDTO shortLinkCreateReqDTO = BeanUtil.toBean(requestParam,
+                    ShortLinkCreateReqDTO.class);
+            shortLinkCreateReqDTO.setOriginUrl(originUrls.get(i));
+            shortLinkCreateReqDTO.setDescribe(describes.get(i));
+
+            try {
+                ShortLinkCreateRespDTO shortLink = this.createShortLink(shortLinkCreateReqDTO);
+                ShortLinkBaseInfoRespDTO linkBaseInfoRespDTO =
+                        ShortLinkBaseInfoRespDTO.builder()
+                                .fullShortUrl(shortLink.getFullShortUrl())
+                                .originUrl(shortLink.getOriginalUrl())
+                                .describe(describes.get(i))
+                                .build();
+                result.add(linkBaseInfoRespDTO);
+            } catch (Throwable ex) {
+                log.error("Batch create short link failure, request origin url {}",
+                        originUrls.get(i));
+            }
+        }
+
+        return ShortLinkBatchCreateRespDTO.builder()
+                .total(result.size())
+                .baseLinkInfos(result)
+                .build();
     }
 
     @SneakyThrows
     @Override
     public void restoreUrl(String shortUri, HttpServletRequest request, HttpServletResponse response) {
-        String fullShortUrl = request.getServerName() + "/" + shortUri;
-        String originalLink = stringRedisTemplate.opsForValue().get(String.format(REDIRECT_SHORT_LINK_KEY, fullShortUrl));
+        String serverName = request.getServerName();
         String serverPort = Optional.of(request.getServerPort())
                 .filter(each -> !Objects.equals(each, 80))
                 .map(String::valueOf)
@@ -268,6 +314,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .orElse("");
 
         // first cache query fetch original url address, directly redirect and exit
+        String fullShortUrl = serverName + serverPort + "/" + shortUri;
+        String originalLink = stringRedisTemplate.opsForValue().get(String.format(REDIRECT_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(originalLink)) {
             response.sendRedirect(originalLink);
             shortLinkStats(fullShortUrl, null, request, response);
@@ -353,7 +401,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             // continue executing redirection
             if (shortLinkDO == null || (shortLinkDO.getValidDate() != null && shortLinkDO.getValidDate().before(new Date()))) {
                 // if queried short link item already got expired, add a dash to cache occupy
-
                 stringRedisTemplate.opsForValue().set(
                             String.format(REDIRECT_IS_BLANK_SHORT_LINK_KEY, fullShortUrl),
                             "-",

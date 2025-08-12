@@ -39,7 +39,6 @@ import org.ucd.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkNetworkStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkOsStatsMapper;
 import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
-import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkStatsAccessDailyRespDTO;
@@ -309,7 +308,7 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
             String uvType = uvTypeList.stream()
                     .filter(item -> Objects.equals(each.getUser(), item.get("user")))
                     .findFirst()
-                    .map(item -> item.get("UvType"))
+                    .map(item -> item.get("uvType"))
                     .map(Object::toString)
                     .orElse("Old Visitor");
             each.setUvType(uvType);
@@ -336,11 +335,12 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
                 requestParam.getEndDate(),
                 userAccessLogsList
         );
+
         actualResult.getRecords().forEach(each -> {
             String uvType = uvTypeList.stream()
                     .filter(item -> Objects.equals(each.getUser(), item.get("user")))
                     .findFirst()
-                    .map(item -> item.get("UvType"))
+                    .map(item -> item.get("uvType"))
                     .map(Object::toString)
                     .orElse("Old Visitor");
             each.setUvType(uvType);
