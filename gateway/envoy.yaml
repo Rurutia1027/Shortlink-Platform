@@ -20,11 +20,11 @@ static_resources:
                         - match:
                             prefix: "/api/short-link/project"
                           route:
-                            cluster: project_cluster
+                            cluster: short-link-project
                         - match:
                             prefix: "/api/short-link/admin"
                           route:
-                            cluster: admin_cluster
+                            cluster: short-link-admin
                 http_filters:
                   - name: envoy.filters.http.router
                     typed_config:
@@ -32,31 +32,31 @@ static_resources:
 
   clusters:
     # Project cluster
-    - name: project_cluster
+    - name: short-link-project
       connect_timeout: 0.25s
       type: STRICT_DNS
       lb_policy: ROUND_ROBIN
       load_assignment:
-        cluster_name: project_cluster
+        cluster_name: short-link-project
         endpoints:
           - lb_endpoints:
               - endpoint:
                   address:
                     socket_address:
-                      address: project
+                      address: short-link-project
                       port_value: 8001
 
     # Admin cluster
-    - name: admin_cluster
+    - name: short-link-admin
       connect_timeout: 0.25s
       type: STRICT_DNS
       lb_policy: ROUND_ROBIN
       load_assignment:
-        cluster_name: admin_cluster
+        cluster_name: short-link-admin
         endpoints:
           - lb_endpoints:
               - endpoint:
                   address:
                     socket_address:
-                      address: admin
+                      address: short-link-admin
                       port_value: 8002
