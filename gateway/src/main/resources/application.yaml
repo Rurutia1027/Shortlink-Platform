@@ -1,2 +1,29 @@
 server:
   port: 8000
+
+spring:
+  application:
+    name: short-link-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: admin_route
+          uri: http://localhost:8002  # Admin service URL
+          predicates:
+            - Path=/api/short-link/admin/**
+        - id: project_route
+          uri: http://localhost:8001  # Project service URL
+          predicates:
+            - Path=/api/short-link/project/**
+    consul:
+      host: 127.0.0.1
+      port: 8500
+      discovery:
+        service-name: shortlink-platform
+        register: true
+      config:
+        enabled: false
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
