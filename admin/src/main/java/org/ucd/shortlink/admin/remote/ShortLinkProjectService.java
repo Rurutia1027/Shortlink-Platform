@@ -85,7 +85,7 @@ public interface ShortLinkProjectService {
     Result<Page<ShortLinkPageRespDTO>> pageShortLink(@RequestParam("gid") String gid,
                                                      @RequestParam("orderTag") String orderTag,
                                                      @RequestParam("current") Long current,
-                                                     @RequestParam("size") Long size;
+                                                     @RequestParam("size") Long size);
 
     /**
      * Query short link count in the given group
