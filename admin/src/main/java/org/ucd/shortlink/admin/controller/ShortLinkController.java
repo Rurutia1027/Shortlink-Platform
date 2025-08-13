@@ -17,8 +17,9 @@
 
 package org.ucd.shortlink.admin.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.common.convention.result.Results;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
-import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
+import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRemoveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkBatchCreateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
@@ -44,18 +45,17 @@ import org.ucd.shortlink.admin.toolkit.EasyExcelWebUtil;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class ShortLinkController {
 
-    // TODO: Refactor into SpringCloud Feign invocation
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkProjectService shortLinkProjectService;
 
     /**
      * Create short link
      */
     @PostMapping("/api/short-link/admin/v1/create")
     public Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShortLinkCreateReqDTO requestParam) {
-        return shortLinkRemoteService.createShortLink(requestParam);
+        return shortLinkProjectService.createShortLink(requestParam);
     }
 
     /**
@@ -65,7 +65,7 @@ public class ShortLinkController {
     @PostMapping("/api/short-link/admin/v1/create/batch")
     public void batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO requestParam, HttpServletResponse response) {
         Result<ShortLinkBatchCreateRespDTO> shortLinkBatchCreateRespDTOResult =
-                shortLinkRemoteService.batchCreateShortLink(requestParam);
+                shortLinkProjectService.batchCreateShortLink(requestParam);
         if (shortLinkBatchCreateRespDTOResult.isSuccess()) {
             List<ShortLinkBaseInfoRespDTO> baseLinkInfos = shortLinkBatchCreateRespDTOResult.getData().getBaseLinkInfos();
             EasyExcelWebUtil.write(response, "Batch_ShortLink-SaaS_ShortLink_Platform",
@@ -78,7 +78,7 @@ public class ShortLinkController {
      */
     @PutMapping("/api/short-link/admin/v1/update")
     public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam) {
-        shortLinkRemoteService.updateShortLink(requestParam);
+        shortLinkProjectService.updateShortLink(requestParam);
         return Results.success();
     }
 
@@ -87,8 +87,8 @@ public class ShortLinkController {
      * Paging query short link
      */
     @PostMapping("/api/short-link/admin/v1/page")
-    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(@RequestBody ShortLinkPageReqDTO requestParam) {
-        return shortLinkRemoteService.pageShortLink(requestParam);
+    public Result<Page<ShortLinkPageRespDTO>> pageShortLink(@RequestBody ShortLinkPageReqDTO requestParam) {
+        return shortLinkProjectService.pageShortLink(requestParam);
     }
 
     /**
@@ -96,7 +96,7 @@ public class ShortLinkController {
      */
     @GetMapping("/api/short-link/admin/v1/count")
     public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam List<String> requestParam) {
-        return shortLinkRemoteService.listGroupShortLinkCount(requestParam);
+        return shortLinkProjectService.listGroupShortLinkCount(requestParam);
     }
 
     /**
@@ -104,7 +104,7 @@ public class ShortLinkController {
      */
     @PostMapping("/api/short-link/admin/v1/recycle-bin/remove")
     public Result<Void> removeRecycleBin(@RequestBody RecycleBinRemoveReqDTO requestParam) {
-        shortLinkRemoteService.removeRecycleBin(requestParam);
+        shortLinkProjectService.removeRecycleBin(requestParam);
         return Results.success();
     }
 }

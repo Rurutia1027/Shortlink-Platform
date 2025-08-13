@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.common.convention.result.Results;
+import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
 import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
 
 /**
@@ -32,9 +33,7 @@ import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
 @RestController
 @RequiredArgsConstructor
 public class UrlTitleController {
-    // TODO: Refactor into SpringCloud Feign invocation
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkProjectService shortLinkProjectService;
 
     /**
      * Fetch website title via provided url
@@ -43,6 +42,6 @@ public class UrlTitleController {
      */
     @GetMapping("/api/short-link/admin/v1/title")
     public Result<String> getTitleByUrl(@RequestParam("url") String url) {
-        return shortLinkRemoteService.getTitleByUrl(url);
+        return shortLinkProjectService.getTitleByUrl(url);
     }
 }

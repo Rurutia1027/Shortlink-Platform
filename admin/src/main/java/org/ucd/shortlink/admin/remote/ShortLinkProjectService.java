@@ -24,12 +24,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.ucd.shortlink.admin.common.convention.result.Result;
+import org.ucd.shortlink.admin.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinRemoveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkBatchCreateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
+import org.ucd.shortlink.admin.remote.dto.req.ShortLinkStatsReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
@@ -75,17 +80,11 @@ public interface ShortLinkProjectService {
     /**
      * Paging query short link
      *
-     * @param gid      Group ID
-     * @param orderTag sorting tag
-     * @param current  current page
-     * @param size     page item size
+     * @param requestParam
      * @return paging query short link response body
      */
-    @GetMapping("/api/short-link/v1/page")
-    Result<Page<ShortLinkPageRespDTO>> pageShortLink(@RequestParam("gid") String gid,
-                                                     @RequestParam("orderTag") String orderTag,
-                                                     @RequestParam("current") Long current,
-                                                     @RequestParam("size") Long size);
+    @PostMapping("/api/short-link/v1/page")
+    Result<Page<ShortLinkPageRespDTO>> pageShortLink(@RequestBody ShortLinkPageReqDTO requestParam);
 
     /**
      * Query short link count in the given group
@@ -94,8 +93,7 @@ public interface ShortLinkProjectService {
      * @return grouped short link count value
      */
     @GetMapping("/api/short-link/v1/count")
-    Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam(
-            "requestParam") List<String> requestParam);
+    Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam);
 
 
     /**
@@ -120,15 +118,11 @@ public interface ShortLinkProjectService {
     /**
      * Paging query recycled short link items
      *
-     * @param gidList group ID collection
-     * @param current current page
-     * @param size    total items in current page
+     * @param requestParam
      * @return paged short link items
      */
     @GetMapping("/api/short-link/v1/recycle-bin/page")
-    Result<Page<ShortLinkPageRespDTO>> pageRecycleBinShortLink(@RequestParam("gidList") List<String> gidList,
-                                                               @RequestParam("current") Long current,
-                                                               @RequestParam("size") Long size);
+    Result<Page<ShortLinkPageRespDTO>> pageRecycleBinShortLink(@RequestBody ShortLinkRecycleBinPageReqDTO requestParam);
 
     /**
      * Recover recycled short link from Recycle Bin
@@ -152,18 +146,11 @@ public interface ShortLinkProjectService {
      * <p>
      * TODO: preserve API but modify underlying metric collection & storage strategy here.
      *
-     * @param fullShortUrl full short url address
-     * @param gid          group ID
-     * @param startDate    start date monitor metric query
-     * @param endDate      end date for monitoring metric query
+     * @param requestParam
      * @return queried short link monitor metric records
      */
     @GetMapping("/api/short-link/v1/stats")
-    Result<ShortLinkStatsRespDTO> shortLinkStats(@RequestParam("fullShortUrl") String fullShortUrl,
-                                                 @RequestParam("gid") String gid,
-                                                 @RequestParam("startDate") String startDate,
-                                                 @RequestParam("endDate") String endDate);
-
+    Result<ShortLinkStatsRespDTO> shortLinkStats(@RequestBody ShortLinkStatsReqDTO requestParam);
 
     /**
      * Fetch short links in the given group monitor metric records in the given specific
@@ -182,29 +169,18 @@ public interface ShortLinkProjectService {
     /**
      * Fetch short link in specific group and specific date ranges access monitor metrics
      *
-     * @param fullShortUrl short link url
-     * @param gid          group ID that queried short link locates
-     * @param startDate    query monitor metrics start date
-     * @param endDate      query monitor metrics end date
+     * @param requestParam
      * @return queried monitor metric records
      */
     @GetMapping("/api/short-link/v1/stats/access-records")
-    Result<Page<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecords(@RequestParam("fullShortUrl") String fullShortUrl,
-                                                                                @RequestParam("gid") String gid,
-                                                                                @RequestParam("startDate") String startDate,
-                                                                                @RequestParam("endDate") String endDate);
-
+    Result<Page<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecords(@RequestBody ShortLinkStatsAccessRecordReqDTO requestParam);
     /**
      * Fetch monitor metric records of short links in the given specific group ID.
      *
-     * @param gid       group ID
-     * @param startDate start date of querying monitor metrics
-     * @param endDate   end date of querying monitor metrics
+     * @param requestParam
      * @return short link access monitor metrics in the given group ID and given specific
      * date range
      */
     @GetMapping("/api/short-link/v1/stats/access-record/group")
-    Result<Page<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(@RequestParam("gid") String gid,
-                                                                                    @RequestParam("startDate") String startDate,
-                                                                                    @RequestParam("endDate") String endDate);
+    Result<Page<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(@RequestBody ShortLinkGroupStatsAccessRecordReqDTO requestParam);
 }

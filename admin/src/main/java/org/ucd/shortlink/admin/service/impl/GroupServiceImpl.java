@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.ucd.shortlink.admin.common.biz.UserContext;
@@ -32,6 +33,7 @@ import org.ucd.shortlink.admin.dto.req.ShortLinkGroupSortRespDTO;
 import org.ucd.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
+import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
 import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
 import org.ucd.shortlink.admin.service.GroupService;
 import org.ucd.shortlink.admin.toolkit.RandomGenerator;
@@ -46,11 +48,9 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implements GroupService {
-
-    // TODO: Refactor into SpringCloud Feign invocation
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkProjectService shortLinkProjectService;
 
     @Override
     public void saveGroup(String groupName) {
@@ -82,7 +82,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
                 .orderByDesc(GroupDO::getSortOrder, GroupDO::getUpdateTime);
         List<GroupDO> groupDOList = baseMapper.selectList(queryWrapper);
         Result<List<ShortLinkGroupCountQueryRespDTO>> listResult =
-                shortLinkRemoteService.listGroupShortLinkCount(groupDOList.stream().map(GroupDO::getGid).toList());
+                shortLinkProjectService.listGroupShortLinkCount(groupDOList.stream().map(GroupDO::getGid).toList());
 
 
         // convert remote call queried count entity into hash map
