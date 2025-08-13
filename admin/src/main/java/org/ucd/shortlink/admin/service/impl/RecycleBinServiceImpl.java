@@ -21,6 +21,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ucd.shortlink.admin.common.biz.UserContext;
@@ -28,6 +29,7 @@ import org.ucd.shortlink.admin.common.convention.exception.ServiceException;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.dao.entity.GroupDO;
 import org.ucd.shortlink.admin.dao.mapper.GroupMapper;
+import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
 import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
@@ -42,10 +44,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecycleBinServiceImpl implements RecycleBinService {
     private final GroupMapper groupMapper;
-
-    // TODO: Refactor into SpringCloud Feign invocation
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkProjectService shortLinkProjectService;
 
     /**
      * Paging query recycled short link
@@ -55,7 +54,7 @@ public class RecycleBinServiceImpl implements RecycleBinService {
      */
 
     @Override
-    public Result<IPage<ShortLinkPageRespDTO>> pageRecycledShortLink(ShortLinkRecycleBinPageReqDTO requestParam) {
+    public Result<Page<ShortLinkPageRespDTO>> pageRecycledShortLink(ShortLinkRecycleBinPageReqDTO requestParam) {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getUsername, UserContext.getUsername())
                 .eq(GroupDO::getDelFlag, 0);
@@ -67,6 +66,6 @@ public class RecycleBinServiceImpl implements RecycleBinService {
         }
 
         requestParam.setGidList(groupDOList.stream().map(GroupDO::getGid).toList());
-        return shortLinkRemoteService.pageRecycledShortLink(requestParam);
+        return shortLinkProjectService.pageRecycleBinShortLink(requestParam);
     }
 }

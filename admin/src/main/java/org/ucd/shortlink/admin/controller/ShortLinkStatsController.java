@@ -18,11 +18,13 @@
 package org.ucd.shortlink.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.dto.req.ShortLinkStatsAccessRecordReqDTO;
+import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
 import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkStatsReqDTO;
@@ -36,27 +38,22 @@ import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkStatsRespDTO;
 @RestController
 @RequiredArgsConstructor
 public class ShortLinkStatsController {
-
-    /**
-     * TODO: modify this to SpringCloud Feign
-     */
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkProjectService shortLinkProjectService;
 
     /**
      * Short link monitor metric stats
      */
     @GetMapping("/api/short-link/admin/v1/stats")
     public Result<ShortLinkStatsRespDTO> shortLinkStats(ShortLinkStatsReqDTO requestParam) {
-        return shortLinkRemoteService.oneShortLinkStats(requestParam);
+        return shortLinkProjectService.shortLinkStats(requestParam);
     }
 
     /**
      * Fetch project side's short link monitor stats
      */
     @GetMapping("/api/short-link/admin/v1/stats/access-record")
-    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
-        return shortLinkRemoteService.shortLinkStatsAccessRecord(requestParam);
+    public Result<Page<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
+        return shortLinkProjectService.shortLinkStatsAccessRecords(requestParam);
     }
 
 
@@ -64,7 +61,7 @@ public class ShortLinkStatsController {
      * Fetch short link grouped monitor statistic records
      */
     @GetMapping("/api/short-link/admin/v1/stats/access-record/group")
-    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
-        return shortLinkRemoteService.groupShortLinkStatsAccessRecord(requestParam);
+    public Result<Page<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        return shortLinkProjectService.groupShortLinkStatsAccessRecord(requestParam);
     }
 }
