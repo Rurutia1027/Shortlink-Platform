@@ -28,7 +28,7 @@ import org.ucd.shortlink.admin.common.convention.exception.ServiceException;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.dao.entity.GroupDO;
 import org.ucd.shortlink.admin.dao.mapper.GroupMapper;
-import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
+import org.ucd.shortlink.admin.remote.ShortLinkRemoteProjectService;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import org.ucd.shortlink.admin.service.RecycleBinService;
@@ -38,11 +38,12 @@ import java.util.List;
 /**
  * Short Link Recycle interface implementor
  */
-@Service
+
+@Service(value = "recycleBinServiceImplByAdmin")
 @RequiredArgsConstructor
 public class RecycleBinServiceImpl implements RecycleBinService {
     private final GroupMapper groupMapper;
-    private final ShortLinkProjectService shortLinkProjectService;
+    private final ShortLinkRemoteProjectService shortLinkRemoteProjectService;
 
     /**
      * Paging query recycled short link
@@ -64,6 +65,6 @@ public class RecycleBinServiceImpl implements RecycleBinService {
         }
 
         requestParam.setGidList(groupDOList.stream().map(GroupDO::getGid).toList());
-        return shortLinkProjectService.pageRecycleBinShortLink(requestParam);
+        return shortLinkRemoteProjectService.pageRecycleBinShortLink(requestParam);
     }
 }

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.dto.req.ShortLinkStatsAccessRecordReqDTO;
-import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
+import org.ucd.shortlink.admin.remote.ShortLinkRemoteProjectService;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkStatsReqDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkStatsAccessRecordRespDTO;
@@ -36,14 +36,14 @@ import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkStatsRespDTO;
 @RestController(value = "shortLinkStatsControllerByAdmin")
 @RequiredArgsConstructor
 public class ShortLinkStatsController {
-    private final ShortLinkProjectService shortLinkProjectService;
+    private final ShortLinkRemoteProjectService shortLinkRemoteProjectService;
 
     /**
      * Short link monitor metric stats
      */
     @GetMapping("/api/short-link/admin/v1/stats")
     public Result<ShortLinkStatsRespDTO> shortLinkStats(ShortLinkStatsReqDTO requestParam) {
-        return shortLinkProjectService.shortLinkStats(requestParam);
+        return shortLinkRemoteProjectService.shortLinkStats(requestParam);
     }
 
     /**
@@ -51,7 +51,7 @@ public class ShortLinkStatsController {
      */
     @GetMapping("/api/short-link/admin/v1/stats/access-record")
     public Result<Page<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
-        return shortLinkProjectService.shortLinkStatsAccessRecords(requestParam);
+        return shortLinkRemoteProjectService.shortLinkStatsAccessRecords(requestParam);
     }
 
 
@@ -60,6 +60,6 @@ public class ShortLinkStatsController {
      */
     @GetMapping("/api/short-link/admin/v1/stats/access-record/group")
     public Result<Page<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
-        return shortLinkProjectService.groupShortLinkStatsAccessRecord(requestParam);
+        return shortLinkRemoteProjectService.groupShortLinkStatsAccessRecord(requestParam);
     }
 }

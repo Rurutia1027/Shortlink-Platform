@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
-import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
+import org.ucd.shortlink.admin.remote.ShortLinkRemoteProjectService;
 
 /**
  * URL Title Fetch Controller
@@ -32,7 +32,7 @@ import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
 @RestController(value = "urlTitleControllerByAdmin")
 @RequiredArgsConstructor
 public class UrlTitleController {
-    private final ShortLinkProjectService shortLinkProjectService;
+    private final ShortLinkRemoteProjectService shortLinkRemoteProjectService;
 
     /**
      * Fetch website title via provided url
@@ -41,6 +41,6 @@ public class UrlTitleController {
      */
     @GetMapping("/api/short-link/admin/v1/title")
     public Result<String> getTitleByUrl(@RequestParam("url") String url) {
-        return shortLinkProjectService.getTitleByUrl(url);
+        return shortLinkRemoteProjectService.getTitleByUrl(url);
     }
 }
