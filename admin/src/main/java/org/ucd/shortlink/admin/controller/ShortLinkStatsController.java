@@ -17,7 +17,6 @@
 
 package org.ucd.shortlink.admin.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
-import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkStatsReqDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkStatsAccessRecordRespDTO;
@@ -35,7 +33,7 @@ import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkStatsRespDTO;
  * Short Link Admin side Monitor State Controller
  */
 
-@RestController
+@RestController(value = "shortLinkStatsControllerByAdmin")
 @RequiredArgsConstructor
 public class ShortLinkStatsController {
     private final ShortLinkProjectService shortLinkProjectService;

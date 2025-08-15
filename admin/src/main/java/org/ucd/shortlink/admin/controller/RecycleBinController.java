@@ -35,7 +35,7 @@ import org.ucd.shortlink.admin.service.RecycleBinService;
  * Recycle Bin Controller layer
  */
 
-@RestController
+@RestController(value = "recycleBinControllerByAdmin")
 @RequiredArgsConstructor
 public class RecycleBinController {
 

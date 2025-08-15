@@ -34,14 +34,12 @@ import org.ucd.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
 import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
-import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
 import org.ucd.shortlink.admin.service.GroupService;
 import org.ucd.shortlink.admin.toolkit.RandomGenerator;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * short link grouping interface implement class
