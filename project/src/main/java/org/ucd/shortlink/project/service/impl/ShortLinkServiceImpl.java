@@ -125,10 +125,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkNetworkStatsMapper linkNetworkStatsMapper;
     private final LinkStatsTodayMapper linkStatsTodayMapper;
 
-
-    @Value("${short-link.stats.locale.amap-key}")
-    private String statsLocaleAmapKey;
-
     @Value("${short-link.domain.default}")
     private String createShortLinkDefaultDomain;
 
