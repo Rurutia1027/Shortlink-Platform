@@ -25,8 +25,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @EnableDiscoveryClient
 @SpringBootApplication(scanBasePackages = {
         "org.ucd.shortlink.admin",
-        "org.ucd.shortlink.project",
-        "org.ucd.shortlink.aggregation"
+        "org.ucd.shortlink.project"
 })
 @MapperScan(value = {
         "org.ucd.shortlink.project.dao.mapper",
