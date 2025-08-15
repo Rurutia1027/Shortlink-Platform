@@ -49,7 +49,7 @@ import java.util.List;
  */
 
 @FeignClient("short-link-project")
-public interface ShortLinkProjectService {
+public interface ShortLinkRemoteProjectService {
     /**
      * Create short link
      *

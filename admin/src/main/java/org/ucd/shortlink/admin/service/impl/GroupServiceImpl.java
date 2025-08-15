@@ -33,7 +33,7 @@ import org.ucd.shortlink.admin.dto.req.ShortLinkGroupSortRespDTO;
 import org.ucd.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
-import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
+import org.ucd.shortlink.admin.remote.ShortLinkRemoteProjectService;
 import org.ucd.shortlink.admin.service.GroupService;
 import org.ucd.shortlink.admin.toolkit.RandomGenerator;
 
@@ -48,7 +48,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implements GroupService {
-    private final ShortLinkProjectService shortLinkProjectService;
+    private final ShortLinkRemoteProjectService shortLinkRemoteProjectService;
 
     @Override
     public void saveGroup(String groupName) {
@@ -80,7 +80,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
                 .orderByDesc(GroupDO::getSortOrder, GroupDO::getUpdateTime);
         List<GroupDO> groupDOList = baseMapper.selectList(queryWrapper);
         Result<List<ShortLinkGroupCountQueryRespDTO>> listResult =
-                shortLinkProjectService.listGroupShortLinkCount(groupDOList.stream().map(GroupDO::getGid).toList());
+                shortLinkRemoteProjectService.listGroupShortLinkCount(groupDOList.stream().map(GroupDO::getGid).toList());
 
 
         // convert remote call queried count entity into hash map
