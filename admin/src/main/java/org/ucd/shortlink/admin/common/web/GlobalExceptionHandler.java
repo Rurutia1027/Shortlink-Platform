@@ -39,7 +39,8 @@ import java.util.Optional;
 /**
  * Global Exception Handler / Interceptor
  */
-@Component
+
+@Component("globalExceptionHandlerByAdmin")
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {

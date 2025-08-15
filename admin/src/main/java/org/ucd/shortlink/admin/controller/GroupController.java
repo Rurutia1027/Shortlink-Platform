@@ -31,7 +31,6 @@ import org.ucd.shortlink.admin.dto.req.ShortLinkGroupSaveReqDTO;
 import org.ucd.shortlink.admin.dto.req.ShortLinkGroupSortRespDTO;
 import org.ucd.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.ucd.shortlink.admin.dto.resp.ShortLinkGroupRespDTO;
-import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
 import org.ucd.shortlink.admin.service.GroupService;
 
 import java.util.List;

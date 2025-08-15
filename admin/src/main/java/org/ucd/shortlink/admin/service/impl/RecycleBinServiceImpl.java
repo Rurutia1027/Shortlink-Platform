@@ -19,7 +19,6 @@ package org.ucd.shortlink.admin.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,6 @@ import org.ucd.shortlink.admin.common.convention.result.Result;
 import org.ucd.shortlink.admin.dao.entity.GroupDO;
 import org.ucd.shortlink.admin.dao.mapper.GroupMapper;
 import org.ucd.shortlink.admin.remote.ShortLinkProjectService;
-import org.ucd.shortlink.admin.remote.ShortLinkRemoteService;
 import org.ucd.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.ucd.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import org.ucd.shortlink.admin.service.RecycleBinService;

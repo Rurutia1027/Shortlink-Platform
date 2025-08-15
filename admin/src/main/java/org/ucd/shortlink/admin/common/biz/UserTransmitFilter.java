@@ -18,7 +18,6 @@
 package org.ucd.shortlink.admin.common.biz;
 
 import cn.hutool.core.util.StrUtil;
-import com.google.common.collect.Lists;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,11 +27,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
 
 /**
  * User info transmit filter to intercept user info from request chain and insert to
@@ -44,7 +41,6 @@ public class UserTransmitFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-        String requestURI = httpServletRequest.getRequestURI();
         String username = httpServletRequest.getHeader("username");
         if (StrUtil.isNotBlank(username)) {
             String userId = httpServletRequest.getHeader("userId");
