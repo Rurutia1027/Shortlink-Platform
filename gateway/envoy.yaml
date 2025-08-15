@@ -60,3 +60,18 @@ static_resources:
                     socket_address:
                       address: short-link-admin
                       port_value: 8002
+
+    # Aggregation cluster
+    - name: short-link-aggregation
+      connect_timeout: 0.25s
+      type: strict_dns
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: short-link-aggregation
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: 127.0.0.1
+                      port_value: 8003
