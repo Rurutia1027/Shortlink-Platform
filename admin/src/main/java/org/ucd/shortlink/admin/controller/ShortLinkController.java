@@ -44,7 +44,7 @@ import org.ucd.shortlink.admin.toolkit.EasyExcelWebUtil;
 
 import java.util.List;
 
-@RestController
+@RestController(value = "shortLinkControllerByAdmin")
 @RequiredArgsConstructor
 public class ShortLinkController {
 

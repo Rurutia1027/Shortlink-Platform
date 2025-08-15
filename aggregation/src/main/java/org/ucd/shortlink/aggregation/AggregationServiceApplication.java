@@ -15,10 +15,26 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink;
+package org.ucd.shortlink.aggregation;
 
-public class Main {
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+@EnableDiscoveryClient
+@SpringBootApplication(scanBasePackages = {
+        "org.ucd.shortlink.admin",
+        "org.ucd.shortlink.project",
+        "org.ucd.shortlink.aggregation"
+})
+@MapperScan(value = {
+        "org.ucd.shortlink.project.dao.mapper",
+        "org.ucd.shortlink.admin.dao.mapper"
+})
+public class AggregationServiceApplication {
+
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        SpringApplication.run(AggregationServiceApplication.class, args);
     }
 }
