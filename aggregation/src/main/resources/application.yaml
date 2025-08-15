@@ -1,6 +1,5 @@
 server:
   port: 8003
-
 spring:
   application:
     name: short-link-aggregation
@@ -11,6 +10,18 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: true    # enable retry for failed calls
+      ribbon:
+        enabled: false    # if you had Ribbon previously, disable it
+    consul:
+      host: 127.0.0.1
+      port: 8500
+      discovery:
+        register: true
+        service-name: short-link-aggregation
   mvc:
     view:
       prefix: /templates/
@@ -19,14 +30,9 @@ spring:
 aggregation:
   remote-url: http://127.0.0.1:${server.port}
 
-
 short-link:
   domain:
     default: localhost:8003
-
-
-
-
 
 mybatis-plus:
   configuration:

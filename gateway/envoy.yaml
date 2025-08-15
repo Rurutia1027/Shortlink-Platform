@@ -25,6 +25,10 @@ static_resources:
                             prefix: "/api/short-link/admin"
                           route:
                             cluster: short-link-admin
+                        - match:
+                            prefix: "/api/short-link/aggregation"
+                          route:
+                            cluster: short-link-aggregation
                 http_filters:
                   - name: envoy.filters.http.router
                     typed_config:
@@ -60,3 +64,17 @@ static_resources:
                     socket_address:
                       address: short-link-admin
                       port_value: 8002
+    # Agg cluster
+    - name: short-link-aggregation
+      connect_timeout: 0.25s
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: short-link-aggregation
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: short-link-aggregation
+                      port_value: 8003
