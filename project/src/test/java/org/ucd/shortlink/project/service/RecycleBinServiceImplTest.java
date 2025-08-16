@@ -1,19 +1,24 @@
 package org.ucd.shortlink.project.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.ucd.shortlink.project.dto.req.RecycleBinSaveReqDTO;
+import org.ucd.shortlink.project.dto.req.ShortLinkPageReqDTO;
+import org.ucd.shortlink.project.dto.req.ShortLinkRecycleBinPageReqDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import org.ucd.shortlink.project.service.impl.RecycleBinServiceImpl;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -64,6 +69,38 @@ class RecycleBinServiceImplTest {
         verify(stringRedisTemplate).delete(anyString());
     }
 
+    @Test
+    public void testPageShortLInk() {
+        ShortLinkRecycleBinPageReqDTO requestParam = ShortLinkRecycleBinPageReqDTO.builder()
+                .gidList(List.of(UUID.randomUUID().toString(), UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString()))
+                .build();
+        ShortLinkDO shortLinkDO = ShortLinkDO.builder()
+                .totalUip(UUID.randomUUID().variant())
+                .totalPv(UUID.randomUUID().variant())
+                .domain(UUID.randomUUID().toString())
+                .domain(UUID.randomUUID().toString())
+                .gid(UUID.randomUUID().toString())
+                .build();
+        IPage<ShortLinkDO> shortLinkDOPage =
+                new Page<ShortLinkDO>().setCurrent(1L).setSize(1L).setTotal(1L).setRecords(List.of(shortLinkDO));
+        when(shortLinkMapper.selectPage(any(), any())).thenReturn(shortLinkDOPage);
 
+        IPage<ShortLinkPageRespDTO> responseDTO =
+                recycleBinService.pageShortLink(requestParam);
+        Assertions.assertNotNull(responseDTO);
+        Assertions.assertEquals(responseDTO.getCurrent(), 1L);
+        Assertions.assertNotNull(responseDTO.getRecords());
+        Assertions.assertEquals(responseDTO.getRecords().size(), 1);
+    }
 
+    @Test
+    public void testRecoverRecycleBin() {
+
+    }
+
+    @Test
+    public void testRemoveRecycleBin() {
+
+    }
 }
