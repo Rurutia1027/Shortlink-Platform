@@ -33,6 +33,7 @@ public class HashUtil {
     private static final int SIZE = CHARS.length;
 
     private static String convertDecToBase62(long num) {
+        if (num == 0) return "0";
         StringBuilder sb = new StringBuilder();
         while (num > 0) {
             int i = (int) (num % SIZE);
