@@ -9,9 +9,9 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bdd-tests</artifactId>
+    <artifactId>bdd</artifactId>
     <packaging>jar</packaging>
-    <name>shortlink-tests</name>
+    <name>shortlink-bdd</name>
 
     <properties>
         <java.version>17</java.version>

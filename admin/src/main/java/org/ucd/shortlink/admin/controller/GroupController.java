@@ -36,7 +36,7 @@ import org.ucd.shortlink.admin.service.GroupService;
 import java.util.List;
 
 /**
- * short linke grouping control layer
+ * short link grouping control layer
  */
 @RestController
 @RequiredArgsConstructor
