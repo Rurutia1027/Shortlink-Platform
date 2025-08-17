@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.service.impl;
+package org.ucd.shortlink.project.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;

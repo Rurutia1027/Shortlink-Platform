@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.service.impl;
+package org.ucd.shortlink.project.service;
 
 import lombok.SneakyThrows;
 import org.jsoup.Jsoup;
