@@ -85,6 +85,12 @@
             <artifactId>aspectjweaver</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter-test</artifactId>
+            <version>${mybatis-plus.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
