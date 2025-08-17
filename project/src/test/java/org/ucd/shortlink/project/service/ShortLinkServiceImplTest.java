@@ -25,9 +25,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RedissonClient;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.ucd.shortlink.project.common.convention.exception.ServiceException;
 import org.ucd.shortlink.project.common.enums.ValiDateTypeEnum;
+import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
 import org.ucd.shortlink.project.dao.entity.ShortLinkRouteDO;
 import org.ucd.shortlink.project.dao.mapper.LinkAccessLogsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkAccessStatsMapper;
@@ -43,11 +46,11 @@ import org.ucd.shortlink.project.dto.req.ShortLinkCreateReqDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -127,7 +130,7 @@ public class ShortLinkServiceImplTest {
     }
 
     @Test
-    public void testCreateShortLink() {
+    public void testCreateShortLink_with_ShortUriDB_IS_Available() {
         ShortLinkCreateReqDTO requestParam = ShortLinkCreateReqDTO.builder()
                 .createdType(1)
                 .domain(UUID.randomUUID().toString())
@@ -149,5 +152,29 @@ public class ShortLinkServiceImplTest {
         );
         when(shortUriCreationCachePenetrationBloomFilter.add(anyString())).thenReturn(true);
         ShortLinkCreateRespDTO shortLinkCreateRespDTO = shortLinkService.createShortLink(requestParam);
+        Assertions.assertNotNull(shortLinkCreateRespDTO);
+        Assertions.assertNotNull(shortLinkCreateRespDTO.getFullShortUrl());
+        Assertions.assertNotNull(shortLinkCreateRespDTO.getGid());
+        Assertions.assertNotNull(shortLinkCreateRespDTO.getOriginalUrl());
+    }
+
+    @Test
+    public void testCreateShortLink_with_ShortUriDB_NOT_Available() {
+        ShortLinkCreateReqDTO requestParam = ShortLinkCreateReqDTO.builder()
+                .createdType(1)
+                .domain(UUID.randomUUID().toString())
+                .describe(UUID.randomUUID().toString())
+                .originUrl("https://baidu.com")
+                .gid(UUID.randomUUID().toString())
+                .validDate(new Date())
+                .validDateType(ValiDateTypeEnum.PERMANENT.getType())
+                .build();
+        when(shortLinkMapper.insert(any())).thenThrow(new DuplicateKeyException("duplicate " +
+                "key"));
+        when(shortLinkMapper.selectOne(any())).thenReturn(ShortLinkDO.builder().build());
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            shortLinkService.createShortLink(requestParam);
+        });
     }
 }
