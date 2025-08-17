@@ -18,7 +18,10 @@
 package org.ucd.shortlink.project.dto.req;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
@@ -27,6 +30,9 @@ import java.util.List;
  * Batch create short link request body
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ShortLinkBatchCreateReqDTO {
     /**
      * Original url collection
