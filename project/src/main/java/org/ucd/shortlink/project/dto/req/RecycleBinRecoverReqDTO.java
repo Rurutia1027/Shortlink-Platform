@@ -17,13 +17,19 @@
 
 package org.ucd.shortlink.project.dto.req;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Recycle Bin Recover Request Parameters
  */
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RecycleBinRecoverReqDTO {
     /**
      * Short Link Group ID

@@ -11,8 +11,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkMapper;
+import org.ucd.shortlink.project.dto.req.RecycleBinRecoverReqDTO;
+import org.ucd.shortlink.project.dto.req.RecycleBinRemoveReqDTO;
 import org.ucd.shortlink.project.dto.req.RecycleBinSaveReqDTO;
-import org.ucd.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import org.ucd.shortlink.project.service.impl.RecycleBinServiceImpl;
@@ -96,11 +97,25 @@ class RecycleBinServiceImplTest {
 
     @Test
     public void testRecoverRecycleBin() {
+        RecycleBinRecoverReqDTO requestParam = RecycleBinRecoverReqDTO
+                .builder()
+                .fullShortUrl(UUID.randomUUID().toString())
+                .gid(UUID.randomUUID().toString())
+                .build();
 
+        recycleBinService.recoverRecycleBin(requestParam);
+        when(shortLinkMapper.update(any(ShortLinkDO.class), any())).thenReturn(1);
+        when(stringRedisTemplate.delete(anyString())).thenReturn(true);
     }
 
     @Test
     public void testRemoveRecycleBin() {
-
+        RecycleBinRemoveReqDTO requestParam = RecycleBinRemoveReqDTO
+                .builder()
+                .gid(UUID.randomUUID().toString())
+                .fullShortUrl(UUID.randomUUID().toString())
+                .build();
+        recycleBinService.removeRecycleBin(requestParam);
+        when(shortLinkMapper.delete(any())).thenReturn(1);
     }
 }
