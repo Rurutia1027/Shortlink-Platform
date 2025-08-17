@@ -68,6 +68,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
     private final LinkAccessStatsMapper linkAccessStatsMapper;
+    // TODO: I don't want this geography gonna remove locale this feature in future version
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
     private final LinkAccessLogsMapper linkAccessLogsMapper;
     private final LinkBrowserStatsMapper linkBrowserStatsMapper;
@@ -77,7 +78,7 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
 
     @Override
     public ShortLinkStatsRespDTO oneShortLinkStats(ShortLinkStatsReqDTO requestParam) {
-        // Basic short link access metricss
+        // Basic short link access metrics
         List<LinkAccessStatsDO> listStatsByShortLink =
                 linkAccessStatsMapper.listStatsByShortLink(requestParam);
         if (CollUtil.isEmpty(listStatsByShortLink)) {

@@ -17,12 +17,18 @@
 
 package org.ucd.shortlink.project.dto.req;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Short link monitor metrics object
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ShortLinkStatsReqDTO {
     /**
      * Full short link
