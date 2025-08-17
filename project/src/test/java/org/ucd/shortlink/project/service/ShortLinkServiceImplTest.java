@@ -17,6 +17,10 @@
 
 package org.ucd.shortlink.project.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +30,7 @@ import org.mockito.MockitoAnnotations;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RedissonClient;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.ucd.shortlink.project.common.convention.exception.ServiceException;
@@ -43,15 +48,19 @@ import org.ucd.shortlink.project.dao.mapper.LinkStatsTodayMapper;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.ucd.shortlink.project.dao.mapper.ShortLinkRouteMapper;
 import org.ucd.shortlink.project.dto.req.ShortLinkCreateReqDTO;
+import org.ucd.shortlink.project.dto.req.ShortLinkPageReqDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 
 import java.lang.reflect.Field;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -176,5 +185,61 @@ public class ShortLinkServiceImplTest {
         ServiceException exception = assertThrows(ServiceException.class, () -> {
             shortLinkService.createShortLink(requestParam);
         });
+    }
+
+    @Test
+    public void testRestoreUrl_with_OriginalUrl_Cached() {
+        String shortUri = UUID.randomUUID().toString();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(request.getServletPath()).thenReturn("localhost");
+        when(request.getServerPort()).thenReturn(8005);
+        when(request.getHeader("User-Agent")).thenReturn("mac");
+        when(request.getHeader("X-Forwarded-For")).thenReturn("127.0.0.1");
+
+
+        ValueOperations<String, String> valueOperations = mock(ValueOperations.class);
+        SetOperations<String, String> setOperations = mock(SetOperations.class);
+        when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(stringRedisTemplate.opsForSet()).thenReturn(setOperations);
+        when(setOperations.add(anyString())).thenReturn(1L);
+        when(valueOperations.get(anyString())).thenReturn("https://baidu.com");
+        when(shortLinkRouteMapper.selectOne(any())).thenReturn(ShortLinkRouteDO.builder()
+                .gid(UUID.randomUUID().toString())
+                .build());
+        doNothing().when(linkAccessStatsMapper).shortLinkStats(any());
+        doNothing().when(linkLocaleStatsMapper).shortLinkLocaleState(any());
+        doNothing().when(linkOsStatsMapper).shortLinkOsState(any());
+        doNothing().when(linkBrowserStatsMapper).shortLinkBrowserState(any());
+        doNothing().when(linkNetworkStatsMapper).shortLinkNetworkState(any());
+
+        when(linkAccessLogsMapper.insert(any())).thenReturn(1);
+        when(linkDeviceStatsMapper.insert(any())).thenReturn(1);
+        doNothing().when(shortLinkMapper).incrementStats(anyString(), anyString(), anyInt(),
+                any(), any());
+        doNothing().when(linkStatsTodayMapper).shortLinkTodayState(any());
+        shortLinkService.restoreUrl(shortUri, request, response);
+    }
+
+    @Test
+    public void testPageShortLink() {
+        ShortLinkPageReqDTO requestParam = ShortLinkPageReqDTO.builder()
+                .build();
+        IPage<ShortLinkDO> page = new Page<>();
+        ShortLinkDO item1 = ShortLinkDO.builder().domain("item-1-domain").build();
+        ShortLinkDO item2 = ShortLinkDO.builder().domain("item-2-domain").build();
+        page.setCurrent(1L);
+        page.setTotal(2L);
+        page.setSize(2L);
+        page.setRecords(List.of(item1, item2));
+        when(shortLinkMapper.pageLink(any())).thenReturn(page);
+
+        IPage<ShortLinkPageRespDTO> response = shortLinkService.pageShortLink(requestParam);
+        Assertions.assertNotNull(response);
+        Assertions.assertTrue(response.getCurrent() > 0L);
+        Assertions.assertTrue(response.getPages() > 0L);
+        Assertions.assertTrue(response.getSize() > 0L);
+        Assertions.assertTrue(response.getTotal() > 0L);
+        Assertions.assertTrue(response.getRecords().size() > 0);
     }
 }

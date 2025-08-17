@@ -556,7 +556,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .date(new Date())
                         .build();
                 linkNetworkStatsMapper.shortLinkNetworkState(linkNetworkStatsDO);
-                baseMapper.incrementStats(gid, fullShortUrl, 1, uvFirstFlag.get() ? 1 : 0, uipFirstFlag ? 1 : 0);
+                baseMapper.incrementStats(gid, fullShortUrl, 1, uvFirstFlag.get() ? 1 : 0,
+                        uipFirstFlag ? 1 : 0);
                 LinkStatsTodayDO linkStatsTodayDO = LinkStatsTodayDO.builder()
                         .todayPv(1)
                         .todayUv(uvFirstFlag.get() ? 1 : 0)
