@@ -21,11 +21,18 @@ import com.baomidou.mybatisplus.test.autoconfigure.AutoConfigureMybatisPlus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.ucd.shortlink.project.common.convention.result.Result;
+import org.ucd.shortlink.project.dto.req.RecycleBinSaveReqDTO;
 import org.ucd.shortlink.project.service.RecycleBinService;
+
+import static org.mockito.ArgumentMatchers.any;
 
 @WebMvcTest(controllers = RecycleBinController.class)
 @AutoConfigureMybatisPlus
@@ -42,6 +49,28 @@ public class RecycleBinControllerTest {
     public void testGetEmptyRecycleBin() {
         Assertions.assertNotNull(mockMvc);
         Assertions.assertNotNull(recycleBinService);
+    }
+
+    @Test
+    @DisplayName("Given valid request, when saveRecycleBin is called, then it returns success")
+    public void givenValidRequest_whenSaveRecycleBin_thenReturnSuccess() throws Exception {
+        // --- Given ---
+        String requestJson = """
+                    {
+                        "gid": "group123",
+                        "fullShortUrl": "http://short.link/abc123"
+                    }
+                """;
+        Mockito.doNothing().when(recycleBinService).saveRecycleBin(any(RecycleBinSaveReqDTO.class));
+
+        // --- When & Then ---
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/short-link/v1/recycle-bin/save")
+                        .contentType("application/json")
+                        .content(requestJson))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(Result.SUCCESS_CODE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").isEmpty());
     }
 
 }
