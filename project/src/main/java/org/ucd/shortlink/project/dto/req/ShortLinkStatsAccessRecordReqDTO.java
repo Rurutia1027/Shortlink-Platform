@@ -18,13 +18,19 @@
 package org.ucd.shortlink.project.dto.req;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.ucd.shortlink.project.dao.entity.LinkAccessLogsDO;
 
 /**
  * Short link monitor record request param
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ShortLinkStatsAccessRecordReqDTO extends Page<LinkAccessLogsDO> {
 
     /**
