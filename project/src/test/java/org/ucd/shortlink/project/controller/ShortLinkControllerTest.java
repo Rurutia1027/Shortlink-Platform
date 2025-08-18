@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.ucd.shortlink.project.common.convention.result.Result;
+import org.ucd.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.ucd.shortlink.project.service.ShortLinkService;
 
@@ -99,4 +100,59 @@ class ShortLinkControllerTest {
                 .andExpect(jsonPath("$.data").isNotEmpty())
                 .andExpect(jsonPath("$.message").isEmpty());
     }
+
+    /**
+     * @PostMapping("/api/short-link/v1/create/batch") public Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO requestParam) {
+     */
+    @Test
+    @SneakyThrows
+    @DisplayName("Given valid request, when batchCreateShortLink is called, then it returns " +
+            "success")
+    public void givenValid_whenBatchCreateShortLink_thenReturnSuccess() {
+        // --- Given ---
+        String requestJson = """
+                {
+                  "originUrls": [
+                    "https://baidu.com",
+                    "https://openai.com/research"
+                  ],
+                  "describes": [
+                    "Search engine link",
+                    "OpenAI research portal"
+                  ],
+                  "gid": "group-123",
+                  "createdType": 0,
+                  "validDateType": 1,
+                  "validDate": "2025-08-20 12:00:00"
+                }
+                """;
+
+        // -- mock controller inner services --
+        when(shortLinkService.batchCreateShortLink(any())).thenReturn(ShortLinkBatchCreateRespDTO.builder().build());
+
+        // --- When && Then ---
+        mockMvc.perform(post("/api/short-link/v1/create/batch")
+                        .contentType("application/json")
+                        .content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Result.SUCCESS_CODE))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
+
+
+    /**
+     *    @PostMapping("/api/short-link/v1/update")
+     *     public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam) {
+     */
+
+    /**
+     *    @PostMapping("/api/short-link/v1/page")
+     *     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(@RequestBody ShortLinkPageReqDTO requestParam) {
+     */
+
+
+    /**
+     *     @GetMapping("/api/short-link/v1/count")
+     *     public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam List<String> requestParam) {
+     */
 }
