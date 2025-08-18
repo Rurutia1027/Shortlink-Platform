@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.test.autoconfigure.AutoConfigureMybatisPlus;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,7 +63,6 @@ class ShortLinkControllerTest {
         doAnswer(invocation -> {
             HttpServletResponse resp = invocation.getArgument(2);
             resp.sendRedirect(originUrl);
-            ;
             return null;
         }).when(shortLinkService).restoreUrl(eq(shortUri), any(HttpServletRequest.class),
                 any(HttpServletResponse.class));
@@ -211,26 +208,23 @@ class ShortLinkControllerTest {
     }
 
 
-    /**
-     * @GetMapping("/api/short-link/v1/count") public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam List<String> requestParam) {
-     */
     @Test
     @SneakyThrows
     @DisplayName("Given valid request, when listGroupShortLinkCount is called, then it returns " +
             "success")
     public void givenValid_whenListGroupShortLinkCount_thenReturnSuccess() {
         // --- Given ---
-
+        String param1 = "gid1";
+        String param2 = "gid2";
 
         // -- mock inner service --
         when(shortLinkService.listGroupShortLinkCount(any()))
                 .thenReturn(List.of(ShortLinkGroupCountQueryRespDTO.builder().build()));
 
-
         // --- When && Then ---
         mockMvc.perform(get("/api/short-link/v1/count")
-                        .param("requestParam", "gid1")
-                        .param("requestParam", "gid2"))
+                        .param("requestParam", param1)
+                        .param("requestParam", param2))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(Result.SUCCESS_CODE))
                 .andExpect(jsonPath("$.data").isNotEmpty());
