@@ -1,21 +1,30 @@
 package org.ucd.shortlink.project.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.test.autoconfigure.AutoConfigureMybatisPlus;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.ucd.shortlink.project.common.convention.result.Result;
 import org.ucd.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 import org.ucd.shortlink.project.service.ShortLinkService;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -101,9 +110,6 @@ class ShortLinkControllerTest {
                 .andExpect(jsonPath("$.message").isEmpty());
     }
 
-    /**
-     * @PostMapping("/api/short-link/v1/create/batch") public Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO requestParam) {
-     */
     @Test
     @SneakyThrows
     @DisplayName("Given valid request, when batchCreateShortLink is called, then it returns " +
@@ -139,20 +145,94 @@ class ShortLinkControllerTest {
                 .andExpect(jsonPath("$.data").isNotEmpty());
     }
 
+    @Test
+    @SneakyThrows
+    @DisplayName("Given valid request, when updateShortLink is called, then it returns " +
+            "success")
+    public void givenValid_whenUpdateShortLink_thenReturnSuccess() {
+        // --- Given ---
+        String requestJson = """
+                {
+                  "originUrl": "https://openai.com/research",
+                  "fullShortUrl": "https://short.example.com/abc123",
+                  "gid": "group-789",
+                  "validDateType": 1,
+                  "validDate": "2025-12-31 23:59:59",
+                  "describe": "Updated description for OpenAI link"
+                }
+                """;
+
+        // -- mock inner service --
+        Mockito.doNothing().when(shortLinkService).updateShortLink(any());
+
+        // When && Then
+        mockMvc.perform(post("/api/short-link/v1/update")
+                        .contentType("application/json")
+                        .content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Result.SUCCESS_CODE))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    @SneakyThrows
+    @DisplayName("Given valid request, when pageShortLink is called, then it returns " +
+            "success")
+    public void givenValid_whenPageShortLink_thenReturnSuccess() {
+        // --- Given ---
+        String requestJson = """
+                {
+                  "current": 1,
+                  "size": 10,
+                  "gid": "group-123",
+                  "orderTag": "createTime"
+                }
+                """;
+
+        // -- mock inner service actions --
+        IPage<ShortLinkPageRespDTO> pageResp = new Page();
+        pageResp.setCurrent(1)
+                .setTotal(2)
+                .setSize(1)
+                .setPages(1)
+                .setRecords(List.of(ShortLinkPageRespDTO.builder().build()));
+
+        when(shortLinkService.pageShortLink(any())).thenReturn(pageResp);
+
+
+        // --- When && Then ---
+        mockMvc.perform(post("/api/short-link/v1/page")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Result.SUCCESS_CODE))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
+
 
     /**
-     *    @PostMapping("/api/short-link/v1/update")
-     *     public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO requestParam) {
+     * @GetMapping("/api/short-link/v1/count") public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam List<String> requestParam) {
      */
+    @Test
+    @SneakyThrows
+    @DisplayName("Given valid request, when listGroupShortLinkCount is called, then it returns " +
+            "success")
+    public void givenValid_whenListGroupShortLinkCount_thenReturnSuccess() {
+        // --- Given ---
 
-    /**
-     *    @PostMapping("/api/short-link/v1/page")
-     *     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(@RequestBody ShortLinkPageReqDTO requestParam) {
-     */
+
+        // -- mock inner service --
+        when(shortLinkService.listGroupShortLinkCount(any()))
+                .thenReturn(List.of(ShortLinkGroupCountQueryRespDTO.builder().build()));
 
 
-    /**
-     *     @GetMapping("/api/short-link/v1/count")
-     *     public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam List<String> requestParam) {
-     */
+        // --- When && Then ---
+        mockMvc.perform(get("/api/short-link/v1/count")
+                        .param("requestParam", "gid1")
+                        .param("requestParam", "gid2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Result.SUCCESS_CODE))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
 }

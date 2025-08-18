@@ -17,12 +17,18 @@
 
 package org.ucd.shortlink.project.dto.resp;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Short link count query response body
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ShortLinkGroupCountQueryRespDTO {
     /**
      * short link group ID
