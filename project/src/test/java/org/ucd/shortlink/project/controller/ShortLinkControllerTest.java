@@ -63,7 +63,6 @@ class ShortLinkControllerTest {
         doAnswer(invocation -> {
             HttpServletResponse resp = invocation.getArgument(2);
             resp.sendRedirect(originUrl);
-            ;
             return null;
         }).when(shortLinkService).restoreUrl(eq(shortUri), any(HttpServletRequest.class),
                 any(HttpServletResponse.class));

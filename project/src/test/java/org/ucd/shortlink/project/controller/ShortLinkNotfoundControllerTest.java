@@ -27,6 +27,8 @@ class ShortLinkNotfoundControllerTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Given Valid request send request to not found endpoint, should return not " +
+            "found and success status")
     public void givenValidRequest_whenNotFound_thenReturnNotFoundStr() {
         mockMvc.perform(get("/page/notfound"))
                 .andExpect(status().isOk())
