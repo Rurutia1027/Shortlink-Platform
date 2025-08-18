@@ -165,9 +165,12 @@ public class RecycleBinControllerTest {
     @DisplayName("Given valid request, when removeRecycleBin is called, then it will returns " +
             "success")
     public void givenValidRequest_whenRemoveRecycleBin_thenReturnSuccess() {
-        // --- Given ---
+        // --- Given ---s
         String requestJson = """
                 {
+                    "gid": "gid-123",
+                    "startDate": "2025-08-01 00:00:00",
+                    "endDate": "2025-08-09 00:00:00"
                 }
                 """;
 
