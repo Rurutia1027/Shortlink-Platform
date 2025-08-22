@@ -69,6 +69,18 @@ jobs:
       - name: Run Tests
         run: mvn test
 
+      - name: Generate JaCoCo Test report
+        run: mvn verify
+
+      - name: Upload All JaCoCo HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: |
+            ./project/target/site/jacoco/
+            ./admin/target/site/jacoco/
+            ./gateway/target/site/jacoco/
+
       # generate a timestamp based unique build number rather than using latest which is hard to distinguish
       - name: Generate Build Number and Save It to File
         id: build-number
