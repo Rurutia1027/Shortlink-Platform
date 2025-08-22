@@ -86,13 +86,13 @@ jobs:
       # ===== Docker build & push =====
       - name: Build & Push Aggregation Image
         run: |
-          mvn clean jib:build -Pdocker-push -pl aggregation -Dapp.image.tag=${{ env.BUILD_NUMBER }}
+          mvn compile clean jib:build -Pdocker-push -pl aggregation -Dapp.image.tag=${{ env.BUILD_NUMBER }}
           echo "Verifying Aggregation image..."
           docker images | grep aggregation
 
       - name: Build & Push Gateway Image
         run: |
-          mvn clean jib:build -Pdocker-push -pl gateway -Dapp.image.tag=${{ env.BUILD_NUMBER }}
+          mvn compile clean jib:build -Pdocker-push -pl gateway -Dapp.image.tag=${{ env.BUILD_NUMBER }}
           echo "Verifying Aggregation image..."
           docker images | grep aggregation
 
