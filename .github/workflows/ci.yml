@@ -69,15 +69,43 @@ jobs:
       - name: Run Tests
         run: mvn test
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      # generate a timestamp based unique build number rather than using latest which is hard to distinguish
+      - name: Generate Build Number and Save It to File
+        id: build-number
+        run: |
+          BUILD_NUMBER=$(date '+%d-%m-%Y-%H-%M-%S')
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT    
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
+
+      - name: Docker Login
+        uses: docker/login-action@v2
         with:
-          node-version: '22'  # or whichever Node version you want to use
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Install frontend dependencies
-        working-directory: frontend  # adjust if your frontend folder differs
-        run: npm install
+      # ===== Docker build & push =====
+      - name: Build & Push Aggregation Image
+        run: |
+          mvn clean compile jib:build -Pdocker-push -pl aggregation -Dapp.image.tag=${{ env.BUILD_NUMBER }}
 
-      - name: Build frontend
-        working-directory: frontend
-        run: npm run build  # or yarn build if you use yarn
+      - name: Build & Push Gateway Image
+        run: |
+          mvn clean compile jib:build -Pdocker-push -pl gateway -Dapp.image.tag=${{ env.BUILD_NUMBER }}
+
+      - name: Verify Aggregation and Gateway images
+        run: |
+          docker images 
+
+# ==== leave frontend feature to version 2, just do not care about those
+#      - name: Set up Node.js
+#        uses: actions/setup-node@v3
+#        with:
+#          node-version: '22'  # or whichever Node version you want to use
+#
+#      - name: Install frontend dependencies
+#        working-directory: frontend  # adjust if your frontend folder differs
+#        run: npm install
+#
+#      - name: Build frontend
+#        working-directory: frontend
+#        run: npm run build  # or yarn build if you use yarn

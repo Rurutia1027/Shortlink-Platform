@@ -9,7 +9,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bdd</artifactId>
+    <artifactId>shortlink-test</artifactId>
     <packaging>jar</packaging>
     <name>shortlink-bdd</name>
 

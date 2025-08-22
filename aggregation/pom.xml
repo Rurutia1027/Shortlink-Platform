@@ -23,12 +23,54 @@
             <artifactId>shortlink-admin</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>shortlink-project</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-
+    <profiles>
+        <profile>
+            <id>docker-push</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <version>3.4.4</version>
+                        <configuration>
+                            <from>
+                                <image>eclipse-temurin:17</image>
+                                <platforms>
+                                    <platform>
+                                        <architecture>arm64</architecture>
+                                        <os>linux</os>
+                                    </platform>
+                                    <platform>
+                                        <architecture>amd64</architecture>
+                                        <os>linux</os>
+                                    </platform>
+                                </platforms>
+                            </from>
+                            <to>
+                                <image>docker.io/nanachi1027/${project.artifactId}:${app.image.tag}</image>
+                                <auth>
+                                    <username>${env.DOCKER_USERNAME}</username>
+                                    <password>${env.DOCKER_PASSWORD}</password>
+                                </auth>
+                            </to>
+                            <extraDirectories>
+                                <paths>
+                                    <path>
+                                        <from>${project.basedir}/src/main/resources</from>
+                                        <into>/app/resources</into>
+                                    </path>
+                                </paths>
+                            </extraDirectories>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
