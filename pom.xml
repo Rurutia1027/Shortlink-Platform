@@ -19,26 +19,6 @@
 
     <profiles>
         <profile>
-            <id>docker-local</id>
-            <modules>
-                <module>aggregation</module>
-                <module>gateway</module>
-            </modules>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.google.cloud.tools</groupId>
-                        <artifactId>jib-maven-plugin</artifactId>
-                        <version>3.4.4</version>
-                        <configuration>
-                            <from><image>eclipse-temurin:17</image></from>
-                            <to><image>local/${project.artifactId}:${project.version}</image></to>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>docker-push</id>
             <modules>
                 <module>aggregation</module>
@@ -59,6 +39,11 @@
                                     <password>${env.DOCKER_PASSWORD}</password>
                                 </auth>
                             </to>
+                            <container>
+                                <jvmFlags>
+                                    <jvmFlag>-Dspring.profiles.active=${spring.profiles.active}</jvmFlag>
+                                </jvmFlags>
+                            </container>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -84,6 +69,8 @@
         <aspectj.version>1.9.7</aspectj.version>
         <junit.jupiter.version>5.9.3</junit.jupiter.version>
         <spotless-maven-plugin.version>2.22.1</spotless-maven-plugin.version>
+        <image>nanachi1027/${project.artifactId}:${app.image.tag}</image>
+        <app.image.tag>latest</app.image.tag>
     </properties>
 
     <dependencies>
