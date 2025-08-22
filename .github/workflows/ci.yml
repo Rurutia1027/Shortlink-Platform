@@ -87,14 +87,14 @@ jobs:
       - name: Build & Push Aggregation Image
         run: |
           mvn clean compile jib:build -Pdocker-push -pl aggregation -Dapp.image.tag=${{ env.BUILD_NUMBER }}
-          echo "Verifying Aggregation image..."
-          docker images | grep aggregation
 
       - name: Build & Push Gateway Image
         run: |
           mvn clean compile jib:build -Pdocker-push -pl gateway -Dapp.image.tag=${{ env.BUILD_NUMBER }}
-          echo "Verifying Aggregation image..."
-          docker images | grep aggregation
+
+      - name: Verify Aggregation and Gateway images
+        run: |
+          docker images 
 
 # ==== leave frontend feature to version 2, just do not care about those
 #      - name: Set up Node.js
