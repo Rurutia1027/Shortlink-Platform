@@ -5,7 +5,7 @@ spring:
     name: short-link-admin
   datasource:
     driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
-    url: jdbc:shardingsphere:classpath:shardingsphere-config-${database.env:dev}.yaml
+    url: jdbc:shardingsphere:classpath:shardingsphere-config.yaml
   data:
     redis:
       host: 127.0.0.1

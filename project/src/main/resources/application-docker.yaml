@@ -5,7 +5,7 @@ spring:
     name: short-link-project
   datasource:
     driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
-    url: jdbc:shardingsphere:classpath:shardingsphere-config.yaml
+    url: jdbc:shardingsphere:classpath:shardingsphere-config-docker.yaml
   data:
     redis:
       host: 127.0.0.1

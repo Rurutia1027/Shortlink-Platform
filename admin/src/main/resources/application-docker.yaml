@@ -1,15 +1,16 @@
 server:
-  port: 8001
+  port: 8002
 spring:
   application:
-    name: short-link-project
+    name: short-link-admin
   datasource:
     driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
-    url: jdbc:shardingsphere:classpath:shardingsphere-config.yaml
+    url: jdbc:shardingsphere:classpath:shardingsphere-config-docker.yaml
   data:
     redis:
       host: 127.0.0.1
       port: 6379
+
   cloud:
     loadbalancer:
       retry:
@@ -21,17 +22,4 @@ spring:
       port: 8500
       discovery:
         register: true
-        service-name: short-link-project
-  mvc:
-    view:
-      prefix: /templates/
-      suffix: .html
-
-short-link:
-  domain:
-    default: localhost:8001
-
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  mapper-locations: classpath:mapper/*.xml
+        service-name: short-link-admin
