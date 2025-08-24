@@ -72,7 +72,7 @@ services:
       - backend-deploy
 
   shortlink-gateway:
-    image: nanachi1027/shortlink-gateway:22-08-2025-14-35-05
+    image: nanachi1027/shortlink-gateway:24-08-2025-08-33-34
     container_name: shortlink-gateway
     ports:
       - "8000:8000"
@@ -85,7 +85,22 @@ services:
       - redis
       - consul
       - envoy
-#    restart: unless-stopped
+    restart: unless-stopped
+
+  shortlink-aggregation:
+    image: nanachi1027/shortlink-aggregation:24-08-2025-08-33-34
+    container_name: shortlink-aggregation
+    ports:
+      - "8003:8003"
+    networks:
+      - backend-deploy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - mysql
+      - redis
+      - consul
+      - envoy
 
 volumes:
   mysql_data_deploy:
