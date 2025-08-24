@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: short-link-gateway
+    name: shortlink-gateway
   cloud:
     gateway:
       routes:
@@ -14,12 +14,12 @@ spring:
         - id: project_route
           uri: http://shortlink-aggregation:8003
           predicates:
-            - Path=/api/short-link/project/**
+            - Path=/api/short-link/**
     consul:
       host: consul
       port: 8500
       discovery:
-        service-name: short-link-gateway
+        service-name: shortlink-gateway
         register: true
       config:
         enabled: false

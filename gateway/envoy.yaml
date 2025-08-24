@@ -18,63 +18,29 @@ static_resources:
                       domains: ["*"]
                       routes:
                         - match:
-                            prefix: "/api/short-link/project"
+                            prefix: "/api/short-link"
                           route:
-                            cluster: short-link-project
+                            cluster: shortlink-aggregation
                         - match:
                             prefix: "/api/short-link/admin"
                           route:
-                            cluster: short-link-admin
-                        - match:
-                            prefix: "/api/short-link/aggregation"
-                          route:
-                            cluster: short-link-aggregation
+                            cluster: shortlink-aggregation
                 http_filters:
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
 
-  clusters:
-    # Project cluster
-    - name: short-link-project
-      connect_timeout: 0.25s
-      type: STRICT_DNS
-      lb_policy: ROUND_ROBIN
-      load_assignment:
-        cluster_name: short-link-project
-        endpoints:
-          - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: short-link-project
-                      port_value: 8001
-
-    # Admin cluster
-    - name: short-link-admin
-      connect_timeout: 0.25s
-      type: STRICT_DNS
-      lb_policy: ROUND_ROBIN
-      load_assignment:
-        cluster_name: short-link-admin
-        endpoints:
-          - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: short-link-admin
-                      port_value: 8002
     # Agg cluster
-    - name: short-link-aggregation
+    - name: shortlink-aggregation
       connect_timeout: 0.25s
       type: STRICT_DNS
       lb_policy: ROUND_ROBIN
       load_assignment:
-        cluster_name: short-link-aggregation
+        cluster_name: shortlink-aggregation
         endpoints:
           - lb_endpoints:
               - endpoint:
                   address:
                     socket_address:
-                      address: short-link-aggregation
+                      address: shortlink-aggregation
                       port_value: 8003

@@ -72,7 +72,7 @@ services:
       - backend-deploy
 
   shortlink-gateway:
-    image: nanachi1027/shortlink-gateway:24-08-2025-09-32-55
+    image: nanachi1027/shortlink-gateway:24-08-2025-10-34-17
     container_name: shortlink-gateway
     ports:
       - "8000:8000"
@@ -88,7 +88,7 @@ services:
     restart: unless-stopped
 
   shortlink-aggregation:
-    image: nanachi1027/shortlink-aggregation:24-08-2025-09-32-55
+    image: nanachi1027/shortlink-aggregation:24-08-2025-10-34-17
     container_name: shortlink-aggregation
     ports:
       - "8003:8003"

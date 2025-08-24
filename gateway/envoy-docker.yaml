@@ -18,15 +18,11 @@ static_resources:
                       domains: ["*"]
                       routes:
                         - match:
-                            prefix: "/api/short-link/project"
+                            prefix: "/api/short-link"
                           route:
                             cluster: shortlink-aggregation
                         - match:
                             prefix: "/api/short-link/admin"
-                          route:
-                            cluster: shortlink-aggregation
-                        - match:
-                            prefix: "/api/short-link/aggregation"
                           route:
                             cluster: shortlink-aggregation
                 http_filters:
