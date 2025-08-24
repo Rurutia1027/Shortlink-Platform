@@ -47,8 +47,8 @@
                     <extraDirectories>
                         <paths>
                             <path>
-                                <from>${project.basedir}/src/main/resources/application-docker.yaml</from>
-                                <into>/config/gateway/application-docker.yaml</into>
+                                <from>${project.basedir}/src/main/resources/</from>
+                                <into>/config/gateway/</into>
                                 </path>
                         </paths>
                     </extraDirectories>
