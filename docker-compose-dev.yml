@@ -1,4 +1,4 @@
-version: '3.8'
+# for local dev env setup
 
 services:
   # docker-compose up -d  consul
@@ -9,6 +9,11 @@ services:
       - "8500:8500"      # Consul UI & API Port
       - "8600:8600/udp"  # Consul DNS  Port
     command: "agent -dev -client=0.0.0.0"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8500/v1/status/leader" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - backend
     restart: unless-stopped
@@ -18,7 +23,12 @@ services:
     image: envoyproxy/envoy:v1.26.0
     container_name: envoy
     ports:
-      - "10000:10000"   # Ports that Envoy listens to, our services request can be sent through this port.
+      - "10000:10000"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:10000 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - ./gateway/envoy.yaml:/etc/envoy/envoy.yaml:ro  # Envoy config YML file
     networks:
@@ -37,6 +47,11 @@ services:
       MYSQL_PASSWORD: admin
     ports:
       - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "admin", "-padmin" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -47,6 +62,11 @@ services:
     container_name: redis-cache
     ports:
       - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     volumes:
       - redis_data:/data
     networks:

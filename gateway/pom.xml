@@ -36,5 +36,34 @@
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>docker-build</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <version>3.3.2</version>
+                        <configuration>
+                            <extraDirectories>
+                                <paths>
+                                    <path>
+                                        <from>${project.basedir}/src/main/resources/</from>
+                                        <into>/config/gateway/</into>
+                                    </path>
+                                </paths>
+                            </extraDirectories>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

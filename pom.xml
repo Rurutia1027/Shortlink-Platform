@@ -34,23 +34,20 @@
                             <from><image>eclipse-temurin:17</image></from>
                             <to>
                                 <image>docker.io/nanachi1027/${project.artifactId}:${project.version}</image>
+                                <tags>
+                                    <tag>latest</tag>
+                                </tags>
                                 <auth>
                                     <username>${env.DOCKER_USERNAME}</username>
                                     <password>${env.DOCKER_PASSWORD}</password>
                                 </auth>
                             </to>
-                            <container>
-                                <jvmFlags>
-                                    <jvmFlag>-Dspring.profiles.active=${spring.profiles.active}</jvmFlag>
-                                </jvmFlags>
-                            </container>
                         </configuration>
                     </plugin>
                 </plugins>
             </build>
         </profile>
     </profiles>
-
 
     <properties>
         <java.version>17</java.version>
