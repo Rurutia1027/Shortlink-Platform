@@ -2,7 +2,7 @@ server:
   port: 8003
 spring:
   application:
-    name: short-link-aggregation
+    name: shortlink-aggregation
   datasource:
     driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
     url: jdbc:shardingsphere:classpath:shardingsphere-config-docker.yaml
@@ -21,7 +21,7 @@ spring:
       port: 8500
       discovery:
         register: true
-        service-name: short-link-aggregation
+        service-name: shortlink-aggregation
   mvc:
     view:
       prefix: /templates/
