@@ -98,8 +98,6 @@ jobs:
       # ===== Docker build & push =====
       - name: Build & Push Aggregation Image
         run: |
-          mvn clean install -pl admin,project -DskipTests
-          mvn clean package -pl aggregation -DskipTests
           mvn compile jib:build -Pdocker-push -pl aggregation -am -DskipTests -Dapp.image.tag=${{ env.BUILD_NUMBER }}
 
       - name: Build & Push Gateway Image
