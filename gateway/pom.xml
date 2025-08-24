@@ -44,16 +44,14 @@
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
                 <configuration>
-                    <container>
-                        <extraDirectories>
-                            <paths>
-                                <path>
-                                    <from>${project.basedir}/src/main/resources/application-docker.yaml</from>
-                                    <into>/config/gateway/application-docker.yaml</into>
+                    <extraDirectories>
+                        <paths>
+                            <path>
+                                <from>${project.basedir}/src/main/resources/application-docker.yaml</from>
+                                <into>/config/gateway/application-docker.yaml</into>
                                 </path>
-                            </paths>
-                        </extraDirectories>
-                    </container>
+                        </paths>
+                    </extraDirectories>
                 </configuration>
             </plugin>
         </plugins>
