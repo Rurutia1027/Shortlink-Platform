@@ -29,7 +29,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./gateway/envoy.yaml:/etc/envoy/envoy.yaml:ro
+      - ./gateway/envoy-docker.yaml:/etc/envoy/envoy.yaml:ro
     networks:
       - backend-deploy
     depends_on:

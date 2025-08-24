@@ -8,11 +8,11 @@ spring:
     gateway:
       routes:
         - id: admin_route
-          uri: http://localhost:8002  # Admin service URL
+          uri: http://shortlink-aggregation:8003
           predicates:
             - Path=/api/short-link/admin/**
         - id: project_route
-          uri: http://localhost:8001  # Project service URL
+          uri: http://shortlink-aggregation:8003
           predicates:
             - Path=/api/short-link/project/**
     consul:

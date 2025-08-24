@@ -8,7 +8,7 @@ spring:
     url: jdbc:shardingsphere:classpath:shardingsphere-config-docker.yaml
   data:
     redis:
-      host: 127.0.0.1
+      host: redis
       port: 6379
   cloud:
     loadbalancer:
@@ -17,7 +17,7 @@ spring:
       ribbon:
         enabled: false    # if you had Ribbon previously, disable it
     consul:
-      host: 127.0.0.1
+      host: consul
       port: 8500
       discovery:
         register: true
@@ -28,11 +28,11 @@ spring:
       suffix: .html
 
 aggregation:
-  remote-url: http://127.0.0.1:${server.port}
+  remote-url: http://shortlink-aggregatoin:${server.port}
 
 short-link:
   domain:
-    default: localhost:8003
+    default: shortlink-aggregatoin:8003
 
 mybatis-plus:
   configuration:
