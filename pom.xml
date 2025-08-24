@@ -39,11 +39,6 @@
                                     <password>${env.DOCKER_PASSWORD}</password>
                                 </auth>
                             </to>
-                            <container>
-                                <jvmFlags>
-                                    <jvmFlag>-Dspring.profiles.active=${spring.profiles.active}</jvmFlag>
-                                </jvmFlags>
-                            </container>
                         </configuration>
                     </plugin>
                 </plugins>

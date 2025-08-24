@@ -1,0 +1,95 @@
+# for prod local and k8s deployment
+services:
+  # docker-compose up -d  consul
+  consul:
+    image: hashicorp/consul:latest
+    container_name: consul
+    ports:
+      - "8500:8500"      # Consul UI & API Port
+      - "8600:8600/udp"  # Consul DNS  Port
+    command: "agent -dev -client=0.0.0.0"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://consul:8500/v1/status/leader" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - backend-deploy
+    restart: unless-stopped
+
+  # docker-compose up -d  envoy
+  envoy:
+    image: envoyproxy/envoy:v1.26.0
+    container_name: envoy
+    ports:
+      - "10000:10000"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://envoy:10000 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./gateway/envoy.yaml:/etc/envoy/envoy.yaml:ro
+    networks:
+      - backend-deploy
+    depends_on:
+      - consul
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: link
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "mysql", "-u", "admin", "-padmin" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mysql_data_deploy:/var/lib/mysql
+    networks:
+      - backend-deploy
+
+  redis:
+    image: redis:7.0
+    container_name: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - redis_data_deploy:/data
+    networks:
+      - backend-deploy
+
+  shortlink-gateway:
+    image: nanachi1027/shortlink-gateway:22-08-2025-14-35-05
+    container_name: shortlink-gateway
+    ports:
+      - "8000:8000"
+    networks:
+      - backend-deploy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - mysql
+      - redis
+      - consul
+      - envoy
+#    restart: unless-stopped
+
+volumes:
+  mysql_data_deploy:
+  redis_data_deploy:
+
+networks:
+  backend-deploy:
