@@ -34,6 +34,9 @@
                             <from><image>eclipse-temurin:17</image></from>
                             <to>
                                 <image>docker.io/nanachi1027/${project.artifactId}:${project.version}</image>
+                                <tags>
+                                    <tag>latest</tag>
+                                </tags>
                                 <auth>
                                     <username>${env.DOCKER_USERNAME}</username>
                                     <password>${env.DOCKER_PASSWORD}</password>
