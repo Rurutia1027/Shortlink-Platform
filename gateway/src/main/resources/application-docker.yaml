@@ -11,10 +11,14 @@ spring:
           uri: http://shortlink-aggregation:8003
           predicates:
             - Path=/api/short-link/admin/**
+          filters:
+            - RewritePath=/api/short-link/admin/(?<remaining>.*), /api/short-link/admin/${remaining}
         - id: project_route
           uri: http://shortlink-aggregation:8003
           predicates:
             - Path=/api/short-link/**
+          filters:
+            - RewritePath=/api/short-link/(?<remaining>.*), /api/short-link/${remaining}
     consul:
       host: consul
       port: 8500
