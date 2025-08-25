@@ -30,6 +30,7 @@ services:
       retries: 5
     volumes:
       - ./gateway/envoy.yaml:/etc/envoy/envoy.yaml:ro  # Envoy config YML file
+    command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml --log-level info
     networks:
       - backend
     depends_on:
@@ -77,6 +78,8 @@ services:
     volumes:
       - prometheus_data:/prometheus
       - ./monitor/config/prometheus.yaml:/etc/prometheus/prometheus.yaml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
     ports:
       - "9090:9090"
     depends_on:
@@ -117,6 +120,52 @@ services:
       - backend
     volumes:
       - grafana_data:/var/lib/grafana
+  # exporters
+  mysqld_exporter:
+    image: prom/mysqld-exporter:latest
+    container_name: mysqld_exporter
+    ports:
+      - "9104:9104" # default port for MySQL Exporter
+    volumes:
+      - ./monitor/config/my.cnf:/etc/mysqld_exporter/my.cnf:ro
+    command: --config.my-cnf=/etc/mysqld_exporter/my.cnf
+    depends_on:
+      - mysql
+    networks:
+      - backend
+
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: redis_exporter
+    ports:
+      - "9121:9121" # default Redis Exporter port
+    environment:
+      - REDIS_ADDR=redis-cache:6379
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9121/metrics || exit 1" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+    depends_on:
+      - redis
+    networks:
+      - backend
+
+  consul_exporter:
+    image: prom/consul-exporter:latest
+    container_name: consul_exporter
+    ports:
+      - "9107:9107" # default port for Consul Exporter
+    environment:
+      - CONSUL_URI=http://consul:8500
+    depends_on:
+      - consul
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9107/metrics || exit 1" ]
+      interval: 10s
+      retries: 5
 
 volumes:
   mysql_data:

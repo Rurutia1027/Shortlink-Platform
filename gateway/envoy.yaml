@@ -45,3 +45,10 @@ static_resources:
                     socket_address:
                       address: shortlink-aggregation
                       port_value: 8003
+
+# Admin interface for metrics / Prometheus scraping
+admin:
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: 9901
