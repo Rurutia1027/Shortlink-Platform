@@ -119,7 +119,7 @@ services:
       - backend
     volumes:
       - grafana_data:/var/lib/grafana
-
+  # exporters
   mysqld_exporter:
     image: prom/mysqld-exporter:latest
     container_name: mysqld_exporter
@@ -130,6 +130,23 @@ services:
     command: --config.my-cnf=/etc/mysqld_exporter/my.cnf
     depends_on:
       - mysql
+    networks:
+      - backend
+
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: redis_exporter
+    ports:
+      - "9121:9121" # default Redis Exporter port
+    environment:
+      - REDIS_ADDR=redis-cache:6379
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9121/metrics || exit 1" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+    depends_on:
+      - redis
     networks:
       - backend
 

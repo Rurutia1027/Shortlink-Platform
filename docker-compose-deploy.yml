@@ -133,6 +133,25 @@ services:
       - mysql
     networks:
       - backend-deploy
+    restart: unless-stopped
+
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: redis_exporter
+    ports:
+      - "9121:9121" # default Redis Exporter port
+    environment:
+      - REDIS_ADDR=redis-cache:6379
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://redis_exporter:9121/metrics || exit 1" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+    depends_on:
+      - redis
+    networks:
+      - backend-deploy
+    restart: unless-stopped
 
   shortlink-gateway:
     image: nanachi1027/shortlink-gateway:latest
