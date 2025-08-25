@@ -77,6 +77,8 @@ services:
     volumes:
       - prometheus_data:/prometheus
       - ./monitor/config/prometheus.yaml:/etc/prometheus/prometheus.yaml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
     ports:
       - "9090:9090"
     depends_on:
@@ -117,6 +119,19 @@ services:
       - backend
     volumes:
       - grafana_data:/var/lib/grafana
+
+  mysqld_exporter:
+    image: prom/mysqld-exporter:latest
+    container_name: mysqld_exporter
+    ports:
+      - "9104:9104" # default port for MySQL Exporter
+    volumes:
+      - ./monitor/config/my.cnf:/etc/mysqld_exporter/my.cnf:ro
+    command: --config.my-cnf=/etc/mysqld_exporter/my.cnf
+    depends_on:
+      - mysql
+    networks:
+      - backend
 
 volumes:
   mysql_data:

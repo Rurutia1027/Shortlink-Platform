@@ -78,7 +78,9 @@ services:
     container_name: prometheus
     volumes:
       - prometheus_data_deploy:/prometheus
-      - ./monitor/config/prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - ./monitor/config/prometheus-docker.yaml:/etc/prometheus/prometheus.yaml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
     ports:
       - "9090:9090"
     depends_on:
@@ -113,6 +115,24 @@ services:
     volumes:
       - grafana_data_deploy:/var/lib/grafana
     restart: unless-stopped
+
+  mysqld_exporter:
+    image: prom/mysqld-exporter:latest
+    container_name: mysqld_exporter
+    volumes:
+      - ./monitor/config/my-docker.cnf:/etc/mysqld_exporter/my.cnf:ro
+    command: --config.my-cnf=/etc/mysqld_exporter/my.cnf
+    ports:
+      - "9104:9104" # default port for MySQL Exporter
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://mysqld_exporter:9104/metrics || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - mysql
+    networks:
+      - backend-deploy
 
   shortlink-gateway:
     image: nanachi1027/shortlink-gateway:latest
