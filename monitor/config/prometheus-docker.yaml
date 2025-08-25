@@ -17,3 +17,8 @@ scrape_configs:
   - job_name: 'consul'
     static_configs:
       - targets: [ 'consul_exporter:9107' ]
+
+  - job_name: envoy
+    static_configs:
+      - targets: [ 'envoy:9901' ]
+    metrics_path: /stats/prometheus

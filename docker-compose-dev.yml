@@ -30,6 +30,7 @@ services:
       retries: 5
     volumes:
       - ./gateway/envoy.yaml:/etc/envoy/envoy.yaml:ro  # Envoy config YML file
+    command: /usr/local/bin/envoy -c /etc/envoy/envoy.yaml --log-level info
     networks:
       - backend
     depends_on:
