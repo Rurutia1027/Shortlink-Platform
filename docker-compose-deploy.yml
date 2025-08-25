@@ -71,6 +71,27 @@ services:
     networks:
       - backend-deploy
 
+  # prometheus for collecting monitor metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - prometheus_data_deploy:/prometheus
+      - ./monitor/config/prometheus.yaml:/etc/prometheus/prometheus.yaml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - mysql
+      - redis
+      - consul
+      - envoy
+      - shortlink-gateway
+      - shortlink-aggregation
+
+    networks:
+      - backend-deploy
+    restart: unless-stopped
+
   shortlink-gateway:
     image: nanachi1027/shortlink-gateway:latest
     container_name: shortlink-gateway
@@ -85,6 +106,7 @@ services:
       - redis
       - consul
       - envoy
+      - prometheus
     restart: unless-stopped
 
   shortlink-aggregation:
@@ -101,10 +123,12 @@ services:
       - redis
       - consul
       - envoy
+      - prometheus
 
 volumes:
   mysql_data_deploy:
   redis_data_deploy:
+  prometheus_data_deploy:
 
 networks:
   backend-deploy:

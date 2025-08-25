@@ -16,7 +16,6 @@ services:
       retries: 3
     networks:
       - backend
-    restart: unless-stopped
 
   # docker-compose up -d  envoy
   envoy:
@@ -35,7 +34,6 @@ services:
       - backend
     depends_on:
       - consul
-    restart: unless-stopped
 
   mysql:
     image: mysql:8.0
@@ -72,9 +70,28 @@ services:
     networks:
       - backend
 
+  # prometheus for collecting monitor metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - prometheus_data:/prometheus
+      - ./monitor/config/prometheus.yaml:/etc/prometheus/prometheus.yaml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - redis
+      - mysql
+      - consul
+      - envoy
+    networks:
+      - backend
+
 volumes:
   mysql_data:
   redis_data:
+  prometheus_data:
+
 
 networks:
   backend:
