@@ -150,6 +150,22 @@ services:
     networks:
       - backend
 
+  consul_exporter:
+    image: prom/consul-exporter:latest
+    container_name: consul_exporter
+    ports:
+      - "9107:9107" # default port for Consul Exporter
+    environment:
+      - CONSUL_URI=http://consul:8500
+    depends_on:
+      - consul
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9107/metrics || exit 1" ]
+      interval: 10s
+      retries: 5
+
 volumes:
   mysql_data:
   redis_data:
