@@ -1,6 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.ucd.shortlink.project.prometheus.service;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,6 +24,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.ucd.shortlink.project.prometheus.client.PrometheusClient;
+import org.ucd.shortlink.project.prometheus.dto.PromQLBuilder;
+import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryReqDTO;
+import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryRespDTO;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PrometheusServiceTest {
@@ -20,13 +49,32 @@ class PrometheusServiceTest {
 
     @BeforeEach
     void initMockOK() {
-        Assertions.assertNotNull(prometheusClient);
-        Assertions.assertNotNull(prometheusService);
+        assertNotNull(prometheusClient);
+        assertNotNull(prometheusService);
     }
 
     @Test
     void testQueryMetricsBasic() {
-        Assertions.assertTrue(true);
+        PrometheusQueryReqDTO req = new PrometheusQueryReqDTO();
+        req.setVertexName("node1");
+        req.setStartDate("2025-08-26T00:00:00Z");
+        req.setEndDate("2025-08-26T01:00:00Z");
+        req.setStep("15s");
+
+        List<Map<String, Object>> mockMetrics = List.of(
+                Map.of("metric", Map.of("__name__", "prometheus_metric"),
+                        "value", List.of(0L, 123))
+        );
+
+        when(prometheusClient.queryRange(any(PromQLBuilder.class))).thenReturn(mockMetrics);
+
+        PrometheusQueryRespDTO resp = prometheusService.queryMetrics(req);
+
+        assertNotNull(resp);
+        assertEquals(1, resp.getMetrics().size());
+        assertEquals(mockMetrics, resp.getMetrics());
+
+        verify(prometheusClient, times(1)).queryRange(any(PromQLBuilder.class));
     }
 
 }
