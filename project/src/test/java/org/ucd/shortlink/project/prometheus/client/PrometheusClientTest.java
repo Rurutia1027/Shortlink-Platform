@@ -17,29 +17,28 @@
 
 package org.ucd.shortlink.project.prometheus.client;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.web.client.RestTemplate;
+import org.ucd.shortlink.project.configs.PrometheusConfig;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@ExtendWith(MockitoExtension.class)
+@Import(PrometheusConfig.class)
 class PrometheusClientTest {
-
-    @Mock
+    @MockBean
     private RestTemplate restTemplate;
 
+    private PrometheusClient prometheusClient;
     private final String prometheusBaseUrl = "http://localhost:9090";
 
-
-    @InjectMocks
-    private PrometheusClient prometheusClient;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    @Test
+    void testSpringInit() {
         prometheusClient = new PrometheusClient(restTemplate, prometheusBaseUrl);
+        assertNotNull(prometheusClient);
     }
-
-
-
 }

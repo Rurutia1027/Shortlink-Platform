@@ -26,8 +26,8 @@ import org.ucd.shortlink.project.prometheus.dto.PromQLBuilder;
 import java.util.List;
 import java.util.Map;
 
-@Component
 @Data
+@Component
 public class PrometheusClient {
     private final RestTemplate restTemplate;
 
@@ -54,7 +54,6 @@ public class PrometheusClient {
 
         Map<String, Object> response = restTemplate.getForObject(url, Map.class);
 
-        // You’d normally parse the "data" field from the Prometheus response
         return (List<Map<String, Object>>) ((Map<String, Object>) response.get("data")).get("result");
     }
 
