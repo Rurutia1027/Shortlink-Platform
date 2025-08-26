@@ -1,4 +1,5 @@
 # for prod local and k8s deployment
+#  docker compose -f docker-compose-docker.yml up -d
 services:
   # docker-compose up -d  consul
   consul:
