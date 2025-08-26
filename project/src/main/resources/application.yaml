@@ -28,6 +28,8 @@ spring:
       suffix: .html
 
 short-link:
+  prometheus:
+    url: localhost:9090
   domain:
     default: localhost:8001
 

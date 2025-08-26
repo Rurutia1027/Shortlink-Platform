@@ -64,7 +64,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Short link monitor interface implementor
  */
-@Service
+@Service("DBStatsService")
 @RequiredArgsConstructor
 public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
     private final LinkAccessStatsMapper linkAccessStatsMapper;
