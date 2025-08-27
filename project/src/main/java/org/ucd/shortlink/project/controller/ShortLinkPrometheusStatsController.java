@@ -35,14 +35,14 @@ import org.ucd.shortlink.project.service.ShortLinkStatsService;
  */
 @RestController
 @RequiredArgsConstructor
-public class ShortLinkStatsController {
-    @Qualifier(value = "DBStatsService")
+public class ShortLinkPrometheusStatsController {
+    @Qualifier(value = "PrometheusStatsService")
     private final ShortLinkStatsService shortLinkStatsService;
 
     /**
      * Short link item monitor metrics
      */
-    @GetMapping("/api/short-link/v1/stats")
+    @GetMapping("/api/short-link/v1/prometheus/stats")
     public Result<ShortLinkStatsRespDTO> shortLinkStats(ShortLinkStatsReqDTO requestParams) {
         return Results.success(shortLinkStatsService.oneShortLinkStats(requestParams));
     }
@@ -50,7 +50,7 @@ public class ShortLinkStatsController {
     /**
      * Fetch grouping short link monitor metrics
      */
-    @GetMapping("/api/short-link/v1/stats/access-record/group")
+    @GetMapping("/api/short-link/v1/stats/prometheus/access-record/group")
     public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
         return Results.success(shortLinkStatsService.groupShortLinkStatsAccessRecord(requestParam));
     }

@@ -1,5 +1,5 @@
 # for local dev env setup
-
+#  docker compose -f docker-compose-dev.yml up -d
 services:
   # docker-compose up -d  consul
   consul:
