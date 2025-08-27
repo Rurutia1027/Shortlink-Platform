@@ -27,6 +27,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PrometheusQueryReqDTO {
+    private String metricName;
     private String startDate;
     private String endDate;
     private String vertexName;

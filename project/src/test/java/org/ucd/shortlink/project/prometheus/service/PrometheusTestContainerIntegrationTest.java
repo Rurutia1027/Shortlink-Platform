@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.ucd.shortlink.project.prometheus.service;
 
 import org.junit.jupiter.api.AfterAll;
@@ -9,9 +26,14 @@ import org.springframework.web.client.RestTemplate;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.ucd.shortlink.project.prometheus.client.PrometheusClient;
+import org.ucd.shortlink.project.prometheus.common.constant.PrometheusConstants;
+import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryReqDTO;
+import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryRespDTO;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PrometheusTestContainerIntegrationTest {
@@ -20,6 +42,7 @@ public class PrometheusTestContainerIntegrationTest {
 
     private GenericContainer<?> prometheusContainer;
     private PrometheusService prometheusService;
+    private PrometheusClient prometheusClient;
 
     @BeforeAll
     void setUp() {
@@ -33,9 +56,9 @@ public class PrometheusTestContainerIntegrationTest {
                 prometheusContainer.getHost(),
                 prometheusContainer.getMappedPort(9090));
         System.out.println("we got our test context available prometheus endpoint " + prometheusUrl);
-        PrometheusClient client = new PrometheusClient(new RestTemplate(), prometheusUrl);
         prometheusService = new PrometheusService();
-        prometheusService.setPrometheusClient(client);
+        prometheusClient = new PrometheusClient(new RestTemplate(), prometheusUrl);
+        prometheusService.setPrometheusClient(prometheusClient);
     }
 
     @AfterAll
@@ -53,4 +76,22 @@ public class PrometheusTestContainerIntegrationTest {
         Assertions.assertNotNull(prometheusService.getPrometheusClient());
     }
 
+    @Test
+    public void testQueryPrometheusUpJobs() {
+        Instant now = Instant.now();
+        PrometheusQueryReqDTO req = PrometheusQueryReqDTO
+                .builder()
+                .metricName(PrometheusConstants.PROMETHEUS_UP_METRIC_NAME)
+                .startDate(DateTimeFormatter.ISO_INSTANT.format(now))
+                .endDate(DateTimeFormatter.ISO_INSTANT.format(now.plusSeconds(3600)))
+                .step(PrometheusConstants.PROMETHEUS_DEFAULT_STEP)
+                .build();
+
+        PrometheusQueryRespDTO resp = prometheusService.queryMetrics(req);
+        Assertions.assertNotNull(resp);
+        if (resp.getMetrics().size() > 0) {
+            Assertions.assertTrue(resp.getMetrics().get(0).keySet().contains("metric")
+                    && resp.getMetrics().get(0).keySet().contains("values"));
+        }
+    }
 }

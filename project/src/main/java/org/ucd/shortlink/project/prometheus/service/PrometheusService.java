@@ -40,7 +40,7 @@ public class PrometheusService {
     public PrometheusQueryRespDTO queryMetrics(PrometheusQueryReqDTO requestParam) {
         // Initialize Builder
         PromQLBuilder.PromQLBuilderBuilder builder = PromQLBuilder.builder()
-                .metric("prometheus_metric")
+                .metric(requestParam.getMetricName())
                 .start(DateUtil.parse(requestParam.getStartDate()).toInstant())
                 .end(DateUtil.parse(requestParam.getEndDate()).toInstant())
                 .step(requestParam.getStep());
