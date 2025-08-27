@@ -24,6 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.ucd.shortlink.project.prometheus.client.PrometheusClient;
+import org.ucd.shortlink.project.prometheus.common.constant.PrometheusConstants;
 import org.ucd.shortlink.project.prometheus.dto.PromQLBuilder;
 import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryReqDTO;
 import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryRespDTO;
@@ -33,6 +34,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -55,11 +57,12 @@ class PrometheusServiceTest {
 
     @Test
     void testQueryMetricsBasic() {
-        PrometheusQueryReqDTO req = new PrometheusQueryReqDTO();
-        req.setVertexName("node1");
-        req.setStartDate("2025-08-26T00:00:00Z");
-        req.setEndDate("2025-08-26T01:00:00Z");
-        req.setStep("15s");
+        PrometheusQueryReqDTO req = PrometheusQueryReqDTO.builder()
+                .vertexName("node1")
+                .startDate("2025-08-26T00:00:00Z")
+                .endDate("2025-08-26T01:00:00Z")
+                .step(PrometheusConstants.PROMETHEUS_DEFAULT_STEP)
+                .build();
 
         List<Map<String, Object>> mockMetrics = List.of(
                 Map.of("metric", Map.of("__name__", "prometheus_metric"),
@@ -77,4 +80,50 @@ class PrometheusServiceTest {
         verify(prometheusClient, times(1)).queryRange(any(PromQLBuilder.class));
     }
 
+    @Test
+    void testQueryMetricWithLabelsAndAggregation() {
+        PrometheusQueryReqDTO req = PrometheusQueryReqDTO.builder()
+                .vertexName("node1")
+                .instance("instance1")
+                .job("job1")
+                .aggFunc(PrometheusConstants.PROMETHEUS_AGG_FUN_COUNT)
+                .aggBy(PrometheusConstants.PROMETHEUS_AGG_BY_JOB)
+                .isUseRateFunc(true)
+                .rangeDuration(PrometheusConstants.PROMETHEUS_RANGE_DURATION_5M)
+                .startDate("2025-08-26T00:00:00Z")
+                .endDate("2025-08-26T01:00:00Z")
+                .step(PrometheusConstants.PROMETHEUS_DEFAULT_STEP)
+                .build();
+
+        List<Map<String, Object>> mockMetrics = List.of(
+                Map.of("metric", Map.of("__name__", "prometheus_metric"),
+                        "value", List.of(0L, 456)));
+        when(prometheusClient.queryRange(any(PromQLBuilder.class))).thenReturn(mockMetrics);
+        PrometheusQueryRespDTO resp = prometheusService.queryMetrics(req);
+
+        assertNotNull(resp);
+        assertEquals(1, resp.getMetrics().size());
+        assertEquals(mockMetrics, resp.getMetrics());
+
+        verify(prometheusClient, times(1)).queryRange(any(PromQLBuilder.class));
+    }
+
+    @Test
+    void testQueryMetricsEmptyResult() {
+        PrometheusQueryReqDTO req = PrometheusQueryReqDTO.builder()
+                .vertexName("node2")
+                .startDate("2025-08-26T00:00:00Z")
+                .endDate("2025-08-26T01:00:00Z")
+                .step(PrometheusConstants.PROMETHEUS_DEFAULT_STEP)
+                .build();
+
+        when(prometheusClient.queryRange(any(PromQLBuilder.class))).thenReturn(List.of());
+
+        PrometheusQueryRespDTO resp = prometheusService.queryMetrics(req);
+
+        assertNotNull(resp);
+        assertTrue(resp.getMetrics().isEmpty());
+
+        verify(prometheusClient, times(1)).queryRange(any(PromQLBuilder.class));
+    }
 }
