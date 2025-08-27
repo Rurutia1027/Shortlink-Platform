@@ -25,6 +25,7 @@ import org.ucd.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkStatsAccessRecordRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkStatsRespDTO;
+import org.ucd.shortlink.project.prometheus.service.PrometheusService;
 
 /**
  * Short link monitor interface implementor
@@ -32,6 +33,7 @@ import org.ucd.shortlink.project.dto.resp.ShortLinkStatsRespDTO;
 @Service("PrometheusStatsService")
 @RequiredArgsConstructor
 public class ShortLinkStatsPromServiceImpl implements ShortLinkStatsService {
+    private PrometheusService prometheusService;
 
     @Override
     public ShortLinkStatsRespDTO oneShortLinkStats(ShortLinkStatsReqDTO requestParam) {
