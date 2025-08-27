@@ -18,6 +18,9 @@
 package org.ucd.shortlink.project.prometheus.service;
 
 import cn.hutool.core.date.DateUtil;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ucd.shortlink.project.prometheus.client.PrometheusClient;
@@ -28,6 +31,7 @@ import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryRespDTO;
 import java.util.List;
 import java.util.Map;
 
+@Data
 @Service
 @RequiredArgsConstructor
 public class PrometheusService {
