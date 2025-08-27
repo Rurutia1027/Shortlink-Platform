@@ -33,6 +33,7 @@ import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryRespDTO;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -79,11 +80,14 @@ public class PrometheusTestContainerIntegrationTest {
     @Test
     public void testQueryPrometheusUpJobs() {
         Instant now = Instant.now();
+        DateTimeFormatter formatter = DateTimeFormatter
+                .ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                .withZone(ZoneOffset.UTC);
         PrometheusQueryReqDTO req = PrometheusQueryReqDTO
                 .builder()
                 .metricName(PrometheusConstants.PROMETHEUS_UP_METRIC_NAME)
-                .startDate(DateTimeFormatter.ISO_INSTANT.format(now))
-                .endDate(DateTimeFormatter.ISO_INSTANT.format(now.plusSeconds(3600)))
+                .startDate(formatter.format(now))
+                .endDate(formatter.format(now.plusSeconds(3600)))
                 .step(PrometheusConstants.PROMETHEUS_DEFAULT_STEP)
                 .build();
 
