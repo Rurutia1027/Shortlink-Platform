@@ -18,6 +18,7 @@
 package org.ucd.shortlink.project.prometheus.client;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;

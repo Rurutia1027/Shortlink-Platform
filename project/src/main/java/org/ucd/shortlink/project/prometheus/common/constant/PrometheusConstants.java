@@ -19,6 +19,7 @@ package org.ucd.shortlink.project.prometheus.common.constant;
 
 public class PrometheusConstants {
     public static final String PROMETHEUS_DEFAULT_METRIC_NAME = "prometheus_metric";
+    public static final String PROMETHEUS_UP_METRIC_NAME = "up";
 
     public static final String PROMETHEUS_RANGE_DURATION_DEFAULT = "1m";
 
