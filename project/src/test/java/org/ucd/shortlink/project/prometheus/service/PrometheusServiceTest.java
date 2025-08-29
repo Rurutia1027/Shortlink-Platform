@@ -25,12 +25,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.ucd.shortlink.project.prometheus.client.PrometheusClient;
 import org.ucd.shortlink.project.prometheus.common.constant.PrometheusConstants;
+import org.ucd.shortlink.project.prometheus.common.enumeration.PrometheusRespTypeEnum;
 import org.ucd.shortlink.project.prometheus.dto.PromQLBuilder;
 import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryReqDTO;
-import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryRespDTO;
+import org.ucd.shortlink.project.prometheus.dto.PrometheusRespDTO;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -64,20 +66,27 @@ class PrometheusServiceTest {
                 .step(PrometheusConstants.PROMETHEUS_DEFAULT_STEP)
                 .build();
 
-        List<Map<String, Object>> mockMetrics = List.of(
-                Map.of("metric", Map.of("__name__", "prometheus_metric"),
-                        "value", List.of(0L, 123))
-        );
+        PrometheusRespDTO mockResp = PrometheusRespDTO.builder()
+                .data(PrometheusRespDTO.DataDTO.builder().resultType("matrix")
+                        .result(List.of(PrometheusRespDTO.MetricResultDTO
+                                .builder()
+                                .metric(new HashMap<>())
+                                .value(new ArrayList<>())
+                                .values(new ArrayList<>())
+                                .build()))
+                        .build())
+                .status("success")
+                .build();
 
-        when(prometheusClient.queryRange(any(PromQLBuilder.class))).thenReturn(mockMetrics);
+        when(prometheusClient.queryRangeAsDTO(any(PromQLBuilder.class))).thenReturn(mockResp);
 
-        PrometheusQueryRespDTO resp = prometheusService.queryMetrics(req);
+        PrometheusRespDTO resp = prometheusService.queryPrometheusMetric(req);
 
         assertNotNull(resp);
-        assertEquals(1, resp.getMetrics().size());
-        assertEquals(mockMetrics, resp.getMetrics());
+        assertEquals(1, resp.getData().getResult().size());
+        assertEquals("success", resp.getStatus());
 
-        verify(prometheusClient, times(1)).queryRange(any(PromQLBuilder.class));
+        verify(prometheusClient, times(1)).queryRangeAsDTO(any(PromQLBuilder.class));
     }
 
     @Test
@@ -95,17 +104,26 @@ class PrometheusServiceTest {
                 .step(PrometheusConstants.PROMETHEUS_DEFAULT_STEP)
                 .build();
 
-        List<Map<String, Object>> mockMetrics = List.of(
-                Map.of("metric", Map.of("__name__", "prometheus_metric"),
-                        "value", List.of(0L, 456)));
-        when(prometheusClient.queryRange(any(PromQLBuilder.class))).thenReturn(mockMetrics);
-        PrometheusQueryRespDTO resp = prometheusService.queryMetrics(req);
+        PrometheusRespDTO mockPromRespDTO = PrometheusRespDTO.builder()
+                .status("success")
+                .data(PrometheusRespDTO.DataDTO.builder()
+                        .result(List.of(PrometheusRespDTO.MetricResultDTO.builder()
+                                .values(new ArrayList<>())
+                                .value(new ArrayList<>())
+                                .metric(new HashMap<>())
+                                .build()))
+                        .build())
+                .build();
+
+        when(prometheusClient.queryRangeAsDTO(any(PromQLBuilder.class))).thenReturn(mockPromRespDTO);
+        PrometheusRespDTO resp = prometheusService.queryPrometheusMetric(req);
 
         assertNotNull(resp);
-        assertEquals(1, resp.getMetrics().size());
-        assertEquals(mockMetrics, resp.getMetrics());
+        assertEquals(1, resp.getData().getResult().size());
+        assertEquals("success", resp.getStatus());
+        assertEquals(mockPromRespDTO, resp);
 
-        verify(prometheusClient, times(1)).queryRange(any(PromQLBuilder.class));
+        verify(prometheusClient, times(1)).queryRangeAsDTO(any(PromQLBuilder.class));
     }
 
     @Test
@@ -117,13 +135,19 @@ class PrometheusServiceTest {
                 .step(PrometheusConstants.PROMETHEUS_DEFAULT_STEP)
                 .build();
 
-        when(prometheusClient.queryRange(any(PromQLBuilder.class))).thenReturn(List.of());
+        when(prometheusClient.queryRangeAsDTO(any(PromQLBuilder.class)))
+                .thenReturn(PrometheusRespDTO.builder()
+                        .data(PrometheusRespDTO.DataDTO.builder()
+                                .result(new ArrayList<>())
+                                .resultType(PrometheusRespTypeEnum.MATRIX.getType())
+                                .build())
+                        .build());
 
-        PrometheusQueryRespDTO resp = prometheusService.queryMetrics(req);
+        PrometheusRespDTO resp = prometheusService.queryPrometheusMetric(req);
 
         assertNotNull(resp);
-        assertTrue(resp.getMetrics().isEmpty());
+        assertTrue(resp.getData().getResult().isEmpty());
 
-        verify(prometheusClient, times(1)).queryRange(any(PromQLBuilder.class));
+        verify(prometheusClient, times(1)).queryRangeAsDTO(any(PromQLBuilder.class));
     }
 }
