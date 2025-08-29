@@ -24,65 +24,13 @@ import org.springframework.stereotype.Service;
 import org.ucd.shortlink.project.prometheus.client.PrometheusClient;
 import org.ucd.shortlink.project.prometheus.dto.PromQLBuilder;
 import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryReqDTO;
-import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryRespDTO;
 import org.ucd.shortlink.project.prometheus.dto.PrometheusRespDTO;
-
-import java.util.List;
-import java.util.Map;
 
 @Data
 @Service
 @RequiredArgsConstructor
 public class PrometheusService {
     private PrometheusClient prometheusClient;
-
-    public PrometheusQueryRespDTO queryMetrics(PrometheusQueryReqDTO requestParam) {
-        // Initialize Builder
-        PromQLBuilder.PromQLBuilderBuilder builder = PromQLBuilder.builder()
-                .metric(requestParam.getMetricName())
-                .start(DateUtil.parse(requestParam.getStartDate()).toInstant())
-                .end(DateUtil.parse(requestParam.getEndDate()).toInstant())
-                .step(requestParam.getStep());
-
-
-        // Mandatory label
-        builder.addLabel("vertex", requestParam.getVertexName());
-
-        // Optional labels
-        if (requestParam.getInstance() != null && !requestParam.getInstance().isEmpty()) {
-            builder.addLabel("instance", requestParam.getInstance());
-        }
-
-        // Optional labels
-        if (requestParam.getJob() != null && !requestParam.getJob().isEmpty()) {
-            builder.addLabel("job", requestParam.getJob());
-        }
-
-        // Optional aggregation function
-        if (requestParam.getAggFunc() != null && !requestParam.getAggFunc().isEmpty()) {
-            builder.aggregationFunction(requestParam.getAggFunc());
-            if (requestParam.getAggBy() != null && !requestParam.getAggBy().isEmpty()) {
-                builder.aggregationBy(requestParam.getAggBy());
-            }
-        }
-
-        // Optional rate function
-        if (requestParam.isUseRateFunc()) {
-            builder.useRateFunction(true);
-            if (requestParam.getRangeDuration() != null) {
-                builder.rangeDuration(requestParam.getRangeDuration());
-            } else {
-                builder.rangeDuration("5m");
-            }
-        }
-
-        // Build PromQL string
-        PromQLBuilder promQLBuilder = builder.build();
-        List<Map<String, Object>> result = prometheusClient.queryRange(promQLBuilder);
-        PrometheusQueryRespDTO respDTO = PrometheusQueryRespDTO.builder()
-                .metrics(result).build();
-        return respDTO;
-    }
 
     public PrometheusRespDTO queryPrometheusMetric(PrometheusQueryReqDTO requestParam) {
         // Initialize Builder

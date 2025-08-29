@@ -34,12 +34,18 @@ public class PrometheusRespDTO {
     private DataDTO data;
 
     @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class DataDTO {
         private String resultType; // "matrix" | "vector" | "scalar" | "string"
         private List<MetricResultDTO> result;
     }
 
     @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MetricResultDTO {
         private Map<String, String> metric;  // __name__, job, instance, customized labels
         private List<List<Double>> values;   // range query [[timestamp, value], ...]
