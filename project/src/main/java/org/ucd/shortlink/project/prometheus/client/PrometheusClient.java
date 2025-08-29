@@ -43,6 +43,10 @@ public class PrometheusClient {
         this.prometheusBaseUrl = prometheusBaseUrl;
     }
 
+    @Deprecated
+    /**
+     * This function gonna be deprecated please use queryRangeAsDTO instead.
+     */
     public List<Map<String, Object>> queryRange(PromQLBuilder promQLBuilder) {
         String promql = promQLBuilder.buildQuery();
         Long startTs = promQLBuilder.getStart().getEpochSecond();

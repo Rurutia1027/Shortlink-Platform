@@ -25,10 +25,17 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.Map;
 
+
+@Deprecated
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+/**
+ * This DTO gonna be deprecated, use better version {@link PrometheusRespDTO} instead.
+ * In {@link PrometheusRespDTO} better abstraction of prometheus query response metrics,
+ * status, types are declared and implemented.
+ */
 public class PrometheusQueryRespDTO {
     private List<Map<String, Object>> metrics;
 }
