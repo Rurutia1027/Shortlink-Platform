@@ -17,8 +17,8 @@
 
 package org.ucd.shortlink.project.prometheus.service;
 
-import cn.hutool.Hutool;
 import cn.hutool.core.util.StrUtil;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,17 +33,18 @@ import org.testcontainers.utility.DockerImageName;
 import org.ucd.shortlink.project.prometheus.client.PrometheusClient;
 import org.ucd.shortlink.project.prometheus.common.constant.PrometheusConstants;
 import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryReqDTO;
-import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryRespDTO;
+import org.ucd.shortlink.project.prometheus.dto.PrometheusRespDTO;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PrometheusMySqlExporterIntegrationTest {
-    private static final DockerImageName PROMETHEUS_IMAGE =  DockerImageName.parse("prom" +
+    private static final DockerImageName PROMETHEUS_IMAGE = DockerImageName.parse("prom" +
             "/prometheus:latest");
     private static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:8.0");
     private static final DockerImageName MYSQL_EXPORTER_IMAGE = DockerImageName.parse("prom/mysqld-exporter:v0.14.0");
@@ -70,12 +71,12 @@ public class PrometheusMySqlExporterIntegrationTest {
                 .withNetwork(network)
                 .withNetworkAliases("mysql")
                 .waitingFor(Wait.forListeningPort());
-
         mySQLContainer.start();
 
         // mysql exporter
         mysqlExporterContainer = new GenericContainer<>(MYSQL_EXPORTER_IMAGE)
                 .withNetwork(network)
+                .withNetworkAliases("mysql-exporter")
                 .dependsOn(mySQLContainer)
                 .withEnv("DATA_SOURCE_NAME", "testuser:testpswd@(mysql:3306)/")
                 .withExposedPorts(9104)
@@ -135,13 +136,9 @@ public class PrometheusMySqlExporterIntegrationTest {
         }
     }
 
+    @SneakyThrows
     @Test
     public void testQueryPrometheusUpJobs() {
-        // Example: instantiate your controller or service directly
-
-
-
-        PrometheusClient prometheusClient = new PrometheusClient(restTemplate, prometheusUrl);
         Instant now = Instant.now();
         DateTimeFormatter formatter = DateTimeFormatter
                 .ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -149,16 +146,57 @@ public class PrometheusMySqlExporterIntegrationTest {
 
         PrometheusQueryReqDTO req = PrometheusQueryReqDTO.builder()
                 .metricName(PrometheusConstants.PROMETHEUS_UP_METRIC_NAME)
-                .startDate(formatter.format(now))
+                .startDate(formatter.format(now.minusSeconds(3600)))
                 .endDate(formatter.format(now.plusSeconds(3600)))
                 .step(PrometheusConstants.PROMETHEUS_DEFAULT_STEP)
                 .build();
 
-        PrometheusQueryRespDTO resp = prometheusService.queryMetrics(req);
-        Assertions.assertNotNull(resp);
-        if (!resp.getMetrics().isEmpty()) {
-            Assertions.assertTrue(resp.getMetrics().get(0).keySet().contains("metric")
-                    && resp.getMetrics().get(0).keySet().contains("values"));
+        int retries = 10;
+
+        PrometheusRespDTO resp = null;
+        while (retries-- > 0) {
+            resp = prometheusService.queryPromethues(req);
+            if (resp != null && "success".equals(resp.getStatus()) && resp.getData() != null) {
+                boolean containsPrometheus = false;
+                boolean containsMysqlExporter = false;
+
+                for (PrometheusRespDTO.MetricResultDTO metricDTO :
+                        resp.getData().getResult()) {
+                    String job = metricDTO.getMetric().get("job");
+                    List<List<Double>> values = metricDTO.getValues();
+                    if (values != null && !values.isEmpty()) {
+                        boolean hasValidValue = values.stream()
+                                .anyMatch(v -> {
+                                    Double val = v.get(1);
+                                    return val >= 1;
+                                });
+                        if (hasValidValue) {
+                            if (job.equals("prometheus")) {
+                                containsPrometheus = true;
+                            } else if (job.equals("mysql-exporter")) {
+                                containsMysqlExporter = true;
+                            }
+                        }
+                    }
+                }
+                if (containsMysqlExporter && containsPrometheus) {
+                    break;
+                }
+            }
         }
+
+        Assertions.assertNotNull(resp, "Prometheus response should not be null");
+        Assertions.assertNotNull(resp.getData(), "Metrics should not be empty");
+
+        boolean containsPrometheus = resp.getData().getResult().stream()
+                .anyMatch(m -> "prometheus".equals(m.getMetric().get("job")) &&
+                        m.getValues().stream().anyMatch(v -> Double.parseDouble(v.get(1).toString()) >= 1));
+
+        boolean containsMysqlExporter = resp.getData().getResult().stream()
+                .anyMatch(m -> "mysql-exporter".equals(m.getMetric().get("job")) &&
+                        m.getValues().stream().anyMatch(v -> Double.parseDouble(v.get(1).toString()) >= 1));
+
+        Assertions.assertTrue(containsPrometheus, "Metrics should include Prometheus target with value>=1");
+        Assertions.assertTrue(containsMysqlExporter, "Metrics should include MySQL exporter target with value>=1");
     }
 }

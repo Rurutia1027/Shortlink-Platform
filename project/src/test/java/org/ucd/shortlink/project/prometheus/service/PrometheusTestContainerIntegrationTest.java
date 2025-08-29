@@ -98,6 +98,4 @@ public class PrometheusTestContainerIntegrationTest {
                     && resp.getMetrics().get(0).keySet().contains("values"));
         }
     }
-
-
 }
