@@ -17,17 +17,20 @@
 
 package org.ucd.shortlink.project.prometheus.service;
 
+import cn.hutool.Hutool;
+import cn.hutool.core.util.StrUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.springframework.web.client.RestTemplate;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
-import org.testcontainers.utility.MountableFile;
+import org.ucd.shortlink.project.prometheus.client.PrometheusClient;
 import org.ucd.shortlink.project.prometheus.common.constant.PrometheusConstants;
 import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryReqDTO;
 import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryRespDTO;
@@ -50,6 +53,10 @@ public class PrometheusMySqlExporterIntegrationTest {
     private static MySQLContainer<?> mySQLContainer;
     private static GenericContainer<?> mysqlExporterContainer;
     private static GenericContainer<?> prometheusContainer;
+    private static RestTemplate restTemplate;
+    private static String prometheusUrl;
+    private static PrometheusService prometheusService;
+    private static PrometheusClient prometheusClient;
 
     @BeforeAll
     public static void setupContainers() {
@@ -85,6 +92,15 @@ public class PrometheusMySqlExporterIntegrationTest {
                 .waitingFor(Wait.forHttp("/-/ready").forStatusCode(200));
 
         prometheusContainer.start();
+
+        // -- init prometheus client --
+        restTemplate = new RestTemplate();
+        prometheusUrl = String.format("http://%s:%d",
+                prometheusContainer.getHost(),
+                prometheusContainer.getMappedPort(9090));
+        prometheusClient = new PrometheusClient(restTemplate, prometheusUrl);
+        prometheusService = new PrometheusService();
+        prometheusService.setPrometheusClient(prometheusClient);
     }
 
     @Test
@@ -92,6 +108,12 @@ public class PrometheusMySqlExporterIntegrationTest {
         Assertions.assertNotNull(prometheusContainer);
         Assertions.assertNotNull(mysqlExporterContainer);
         Assertions.assertNotNull(mySQLContainer);
+        Assertions.assertNotNull(restTemplate);
+        Assertions.assertTrue(StrUtil.isNotBlank(prometheusUrl));
+        Assertions.assertNotNull(prometheusClient);
+        Assertions.assertNotNull(prometheusService);
+        Assertions.assertNotNull(prometheusService.getPrometheusClient());
+        Assertions.assertNotNull(prometheusClient.getPrometheusBaseUrl());
     }
 
     @AfterAll
@@ -113,11 +135,13 @@ public class PrometheusMySqlExporterIntegrationTest {
         }
     }
 
-    // @Test
+    @Test
     public void testQueryPrometheusUpJobs() {
         // Example: instantiate your controller or service directly
-        PrometheusService prometheusService = new PrometheusService();
 
+
+
+        PrometheusClient prometheusClient = new PrometheusClient(restTemplate, prometheusUrl);
         Instant now = Instant.now();
         DateTimeFormatter formatter = DateTimeFormatter
                 .ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
