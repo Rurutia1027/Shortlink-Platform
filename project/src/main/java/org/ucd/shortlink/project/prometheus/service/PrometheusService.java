@@ -84,7 +84,7 @@ public class PrometheusService {
         return respDTO;
     }
 
-    public PrometheusRespDTO queryPromethues(PrometheusQueryReqDTO requestParam) {
+    public PrometheusRespDTO queryPrometheusMetric(PrometheusQueryReqDTO requestParam) {
         // Initialize Builder
         PromQLBuilder.PromQLBuilderBuilder builder = PromQLBuilder.builder()
                 .metric(requestParam.getMetricName())
