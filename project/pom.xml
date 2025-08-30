@@ -9,6 +9,9 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <artifactId>shortlink-project</artifactId>
+    <properties>
+        <prometheus.client.version>0.16.0</prometheus.client.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -61,6 +64,32 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
+
+        <!--  prometheus client deps -->
+        <!-- Prometheus Simple Client Core -->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient</artifactId>
+            <version>${prometheus.client.version}</version>
+        </dependency>
+        <!-- Prometheus HTTPServer (for exposing /metrics endpoint) -->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_httpserver</artifactId>
+            <version>${prometheus.client.version}</version>
+        </dependency>
+        <!-- Optional: JVM default metrics (memory, GC, threads, etc.) -->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_hotspot</artifactId>
+            <version>${prometheus.client.version}</version>
+        </dependency>
+        <!-- Optional: Common collectors (class loading, etc.) -->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_common</artifactId>
+            <version>${prometheus.client.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-consul-discovery</artifactId>
@@ -97,7 +126,6 @@
             <version>1.20.1</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
