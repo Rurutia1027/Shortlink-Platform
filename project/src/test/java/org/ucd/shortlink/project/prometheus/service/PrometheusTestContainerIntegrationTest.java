@@ -28,7 +28,7 @@ import org.testcontainers.utility.DockerImageName;
 import org.ucd.shortlink.project.prometheus.client.PrometheusClient;
 import org.ucd.shortlink.project.prometheus.common.constant.PrometheusConstants;
 import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryReqDTO;
-import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryRespDTO;
+import org.ucd.shortlink.project.prometheus.dto.PrometheusRespDTO;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -91,11 +91,7 @@ public class PrometheusTestContainerIntegrationTest {
                 .step(PrometheusConstants.PROMETHEUS_DEFAULT_STEP)
                 .build();
 
-        PrometheusQueryRespDTO resp = prometheusService.queryMetrics(req);
+        PrometheusRespDTO resp = prometheusService.queryPrometheusMetric(req);
         Assertions.assertNotNull(resp);
-        if (resp.getMetrics().size() > 0) {
-            Assertions.assertTrue(resp.getMetrics().get(0).keySet().contains("metric")
-                    && resp.getMetrics().get(0).keySet().contains("values"));
-        }
     }
 }

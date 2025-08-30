@@ -155,7 +155,7 @@ public class PrometheusMySqlExporterIntegrationTest {
 
         PrometheusRespDTO resp = null;
         while (retries-- > 0) {
-            resp = prometheusService.queryPromethues(req);
+            resp = prometheusService.queryPrometheusMetric(req);
             if (resp != null && "success".equals(resp.getStatus()) && resp.getData() != null) {
                 boolean containsPrometheus = false;
                 boolean containsMysqlExporter = false;
@@ -202,5 +202,45 @@ public class PrometheusMySqlExporterIntegrationTest {
             Assertions.assertTrue(containsPrometheus, "Metrics should include Prometheus target with value>=1");
             Assertions.assertTrue(containsMysqlExporter, "Metrics should include MySQL exporter target with value>=1");
         }
+    }
+
+    @Test
+    @SneakyThrows
+    public void testMysqlExporterSystemMetricWithStandardDTO() {
+        String metricName = "mysql_global_status_uptime";
+        PrometheusRespDTO resp = null;
+        int retries = 10;
+        DateTimeFormatter formatter = DateTimeFormatter
+                .ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                .withZone(ZoneOffset.UTC);
+
+        while (retries-- > 0) {
+            PrometheusQueryReqDTO req = PrometheusQueryReqDTO.builder()
+                    .metricName(metricName)
+                    .startDate(formatter.format(Instant.now().minusSeconds(600)))
+                    .endDate(formatter.format(Instant.now()))
+                    .step(PrometheusConstants.PROMETHEUS_DEFAULT_STEP)
+                    .build();
+            resp = prometheusService.queryPrometheusMetric(req);
+
+            if (resp != null && "success".equals(resp.getStatus()) && resp.getData() != null
+                    && !resp.getData().getResult().isEmpty()) {
+                break;
+            }
+            Thread.sleep(2000L);
+        }
+
+        Assertions.assertNotNull(resp, "Prometheus response should not be null!!");
+        Assertions.assertNotNull(resp.getData(), "Metrics data should not be null!!");
+
+        PrometheusRespDTO.MetricResultDTO metricResultDTO = resp.getData().getResult().stream()
+                .filter(m -> metricName.equals(m.getMetric().get("__name__")))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("Metric not found!! " + metricName));
+
+        boolean metricHasValidValue = metricResultDTO.getValues().stream()
+                .anyMatch(v -> v.get(1) > 0);
+        Assertions.assertTrue(metricHasValidValue, "Metric " + metricName + " should have " +
+                "valid value > 0");
     }
 }

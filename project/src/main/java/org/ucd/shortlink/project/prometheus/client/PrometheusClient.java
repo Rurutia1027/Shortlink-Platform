@@ -25,7 +25,6 @@ import org.springframework.web.client.RestTemplate;
 import org.ucd.shortlink.project.prometheus.dto.PromQLBuilder;
 import org.ucd.shortlink.project.prometheus.dto.PrometheusRespDTO;
 
-import java.util.List;
 import java.util.Map;
 
 @Data
@@ -41,26 +40,6 @@ public class PrometheusClient {
     ) {
         this.restTemplate = restTemplate;
         this.prometheusBaseUrl = prometheusBaseUrl;
-    }
-
-    @Deprecated
-    /**
-     * This function gonna be deprecated please use queryRangeAsDTO instead.
-     */
-    public List<Map<String, Object>> queryRange(PromQLBuilder promQLBuilder) {
-        String promql = promQLBuilder.buildQuery();
-        Long startTs = promQLBuilder.getStart().getEpochSecond();
-        Long endTs = promQLBuilder.getEnd().getEpochSecond();
-        String step = promQLBuilder.getStep();
-
-        String url = String.format(
-                "%s/api/v1/query_range?query=%s&start=%s&end=%s&step=%s",
-                prometheusBaseUrl, promql, startTs, endTs, step
-        );
-
-        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-
-        return (List<Map<String, Object>>) ((Map<String, Object>) response.get("data")).get("result");
     }
 
     public PrometheusRespDTO queryRangeAsDTO(PromQLBuilder promQLBuilder) {
