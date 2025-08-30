@@ -25,6 +25,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.ucd.shortlink.project.dao.entity.LinkAccessLogsDO;
 import org.ucd.shortlink.project.dao.entity.LinkAccessStatsDO;
@@ -64,6 +65,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Short link monitor interface implementor
  */
+@Primary
 @Service("DBStatsService")
 @RequiredArgsConstructor
 public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
