@@ -43,16 +43,6 @@ public class PrometheusMetricTestConfig {
         return prometheusService;
     }
 
-    @Bean("testMetricsInterceptor")
-    public MetricsInterceptor metricsInterceptor() {
-        return new MetricsInterceptor();
-    }
-
-    @Bean("testWebConfig")
-    public WebConfig webConfig(@Qualifier("testMetricsInterceptor") MetricsInterceptor interceptor) {
-        return new WebConfig(interceptor);
-    }
-
     @Bean("testRestTemplate")
     public RestTemplate restTemplate() {
         return new RestTemplate();

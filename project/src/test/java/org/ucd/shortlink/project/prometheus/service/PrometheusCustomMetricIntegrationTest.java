@@ -17,6 +17,8 @@
 
 package org.ucd.shortlink.project.prometheus.service;
 
+import io.prometheus.client.Counter;
+import io.prometheus.client.Histogram;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -33,8 +35,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 import org.ucd.shortlink.project.configs.PrometheusMetricTestConfig;
 
+import java.io.FileWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 
 @ExtendWith(SpringExtension.class)
@@ -63,7 +66,19 @@ public class PrometheusCustomMetricIntegrationTest {
 
     static {
         network = Network.newNetwork();
-        Path prometheusConfig = Paths.get("src/test/resources/prometheus-test.yml").toAbsolutePath();
+        Path prometheusConfig = null;
+        try {
+            prometheusConfig = Files.createTempFile("prometheus-test", ".yml");
+            FileWriter writer = new FileWriter(prometheusConfig.toFile());
+
+            writer.write("global:\n" +
+                    "  scrape_interval: 2s\n" +
+                    "scrape_configs:\n" +
+                    "  - job_name: 'shortlink-project'\n" +
+                    "    static_configs:\n" +
+                    "      - targets: ['host.testcontainers.internal:9100']\n");
+        } catch (Exception e) {
+        }
         prometheusContainer = new GenericContainer<>(PROMETHEUS_IMAGE)
                 .withNetwork(network)
                 .withFileSystemBind(prometheusConfig.toString(), "/etc/prometheus/prometheus.yml")
@@ -78,4 +93,19 @@ public class PrometheusCustomMetricIntegrationTest {
         Assertions.assertNotNull(prometheusService);
         Assertions.assertNotNull(prometheusService.getPrometheusClient());
     }
+
+    // -- define prometheus metrics
+    private static final Counter requests = Counter.build()
+            .name("shortlink_project_requests_total")
+            .help("Total requests for shortlink project")
+            .labelNames("job")
+            .register();
+
+    private static final Histogram requestLatency = Histogram.build()
+            .name("shortlink_request_latency_seconds")
+            .help("Request latency in seconds")
+            .labelNames("job")
+            .register();
+
+
 }
