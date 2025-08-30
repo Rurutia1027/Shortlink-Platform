@@ -19,6 +19,8 @@ package org.ucd.shortlink.project.prometheus.service;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
+import io.prometheus.client.exporter.HTTPServer;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -34,10 +36,16 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 import org.ucd.shortlink.project.configs.PrometheusMetricTestConfig;
+import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryReqDTO;
+import org.ucd.shortlink.project.prometheus.dto.PrometheusRespDTO;
 
 import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 
 @ExtendWith(SpringExtension.class)
@@ -64,37 +72,9 @@ public class PrometheusCustomMetricIntegrationTest {
         );
     }
 
-    static {
-        network = Network.newNetwork();
-        Path prometheusConfig = null;
-        try {
-            prometheusConfig = Files.createTempFile("prometheus-test", ".yml");
-            FileWriter writer = new FileWriter(prometheusConfig.toFile());
+    private static HTTPServer metricsServer;
 
-            writer.write("global:\n" +
-                    "  scrape_interval: 2s\n" +
-                    "scrape_configs:\n" +
-                    "  - job_name: 'shortlink-project'\n" +
-                    "    static_configs:\n" +
-                    "      - targets: ['host.testcontainers.internal:9100']\n");
-        } catch (Exception e) {
-        }
-        prometheusContainer = new GenericContainer<>(PROMETHEUS_IMAGE)
-                .withNetwork(network)
-                .withFileSystemBind(prometheusConfig.toString(), "/etc/prometheus/prometheus.yml")
-                .withExposedPorts(9090)
-                .waitingFor(Wait.forHttp("/-/ready").forStatusCode(200));
-        prometheusContainer.start();
-    }
-
-    @Test
-    public void initOk() {
-        Assertions.assertNotNull(prometheusContainer);
-        Assertions.assertNotNull(prometheusService);
-        Assertions.assertNotNull(prometheusService.getPrometheusClient());
-    }
-
-    // -- define prometheus metrics
+    // -- define two custom prometheus metric items
     private static final Counter requests = Counter.build()
             .name("shortlink_project_requests_total")
             .help("Total requests for shortlink project")
@@ -107,5 +87,68 @@ public class PrometheusCustomMetricIntegrationTest {
             .labelNames("job")
             .register();
 
+    static {
+        network = Network.newNetwork();
+        Path prometheusConfig = Paths.get("src/test/resources/prometheus-metric-test.yml").toAbsolutePath();
+        prometheusContainer = new GenericContainer<>(PROMETHEUS_IMAGE)
+                .withNetwork(network)
+                .withFileSystemBind(prometheusConfig.toString(), "/etc/prometheus/prometheus.yml")
+                .withExposedPorts(9090)
+                .waitingFor(Wait.forHttp("/-/ready").forStatusCode(200));
+        prometheusContainer.start();
 
+        try {
+            metricsServer = new HTTPServer("0.0.0.0", 9100, true);
+        } catch (Exception ex) {
+        }
+
+        // -- here we modify the two prometheus metric items
+        for (int i = 0; i < 10; i++) {
+            requests.labels("shortlink-project").inc();
+            try {
+                Histogram.Timer timer =
+                        requestLatency.labels("shortlink-project").startTimer();
+                Thread.sleep(100 + (int) (Math.random() * 200));
+                timer.observeDuration();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    @Test
+    public void initOk() {
+        Assertions.assertNotNull(prometheusContainer);
+        Assertions.assertNotNull(prometheusService);
+        Assertions.assertNotNull(prometheusService.getPrometheusClient());
+        Assertions.assertNotNull(metricsServer);
+    }
+
+
+    // @Test
+    @SneakyThrows
+    void testMetricExposedToPrometheus() {
+        Instant now = Instant.now();
+        DateTimeFormatter formatter = DateTimeFormatter
+                .ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                .withZone(ZoneOffset.UTC);
+        PrometheusQueryReqDTO req = PrometheusQueryReqDTO.builder()
+                .metricName("shortlink_project_requests_total")
+                .startDate(formatter.format(now.minusSeconds(60)))
+                .endDate(formatter.format(now.plusSeconds(60)))
+                .step("5s")
+                .build();
+        PrometheusRespDTO resp = null;
+        int retries = 10;
+        while (retries-- > 0) {
+            resp = prometheusService.queryPrometheusMetric(req);
+            if (resp != null && "success".equals(resp.getStatus()) &&
+                    resp.getData() != null && !resp.getData().getResult().isEmpty()) {
+                break;
+            }
+            Thread.sleep(5000);
+        }
+
+        Assertions.assertNotNull(resp);
+        Assertions.assertTrue(!resp.getData().getResult().isEmpty());
+    }
 }
