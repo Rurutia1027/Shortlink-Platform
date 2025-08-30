@@ -76,13 +76,13 @@ public class PrometheusCustomMetricIntegrationTest {
 
     // -- define two custom prometheus metric items
     private static final Counter requests = Counter.build()
-            .name("shortlink_project_requests_total")
+            .name("shortlink_project_requests_total_x")
             .help("Total requests for shortlink project")
             .labelNames("job")
             .register();
 
     private static final Histogram requestLatency = Histogram.build()
-            .name("shortlink_request_latency_seconds")
+            .name("shortlink_request_latency_seconds_x")
             .help("Request latency in seconds")
             .labelNames("job")
             .register();
