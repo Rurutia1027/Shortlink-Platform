@@ -15,27 +15,21 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.prometheus.client;
+package org.ucd.shortlink.project.config;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.web.client.RestTemplate;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.ucd.shortlink.project.interceptor.MetricsInterceptor;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+@Configuration
+@RequiredArgsConstructor
+public class WebConfig implements WebMvcConfigurer {
+    private final MetricsInterceptor metricsInterceptor;
 
-@ExtendWith(MockitoExtension.class)
-class PrometheusClientTest {
-    @MockBean
-    private RestTemplate restTemplate;
-
-    private PrometheusClient prometheusClient;
-    private final String prometheusBaseUrl = "http://localhost:9090";
-
-    @Test
-    void testSpringInit() {
-        prometheusClient = new PrometheusClient(restTemplate, prometheusBaseUrl);
-        assertNotNull(prometheusClient);
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(metricsInterceptor).addPathPatterns("/**");
     }
 }

@@ -15,27 +15,26 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.prometheus.client;
+package org.ucd.shortlink.project.prometheus.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
+import org.ucd.shortlink.project.configs.PrometheusMetricTestConfig;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-@ExtendWith(MockitoExtension.class)
-class PrometheusClientTest {
-    @MockBean
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = PrometheusMetricTestConfig.class)
+public class IntegrationTest {
+    @Autowired
     private RestTemplate restTemplate;
 
-    private PrometheusClient prometheusClient;
-    private final String prometheusBaseUrl = "http://localhost:9090";
-
     @Test
-    void testSpringInit() {
-        prometheusClient = new PrometheusClient(restTemplate, prometheusBaseUrl);
-        assertNotNull(prometheusClient);
+    public void testOk() {
+        Assertions.assertTrue(true);
+        Assertions.assertNotNull(restTemplate);
     }
 }

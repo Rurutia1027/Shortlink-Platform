@@ -17,20 +17,34 @@
 
 package org.ucd.shortlink.project.configs;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+import org.ucd.shortlink.project.config.WebConfig;
+import org.ucd.shortlink.project.interceptor.MetricsInterceptor;
 import org.ucd.shortlink.project.prometheus.client.PrometheusClient;
+import org.ucd.shortlink.project.prometheus.service.PrometheusService;
 
 @TestConfiguration
-public class PrometheusConfig {
-    @Bean
-    public PrometheusClient prometheusClient(RestTemplate restTemplate) {
-        return new PrometheusClient(restTemplate, "http://localhost:9090");
+public class PrometheusMetricTestConfig {
+
+    @Bean("testPrometheusClient")
+    public PrometheusClient prometheusClient(@Qualifier("testRestTemplate") RestTemplate restTemplate,
+                                             @Value("${prometheus.url}") String prometheusUrl) {
+        return new PrometheusClient(restTemplate, prometheusUrl);
     }
 
-    @Bean
-    public RestTemplate prometheusRestTemplate() {
+    @Bean("testPrometheusService")
+    public PrometheusService prometheusService(@Qualifier("testPrometheusClient") PrometheusClient client) {
+        PrometheusService prometheusService = new PrometheusService();
+        prometheusService.setPrometheusClient(client);
+        return prometheusService;
+    }
+
+    @Bean("testRestTemplate")
+    public RestTemplate restTemplate() {
         return new RestTemplate();
     }
 }
