@@ -18,8 +18,6 @@
 package org.ucd.shortlink.project.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.exporter.common.TextFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,8 +31,7 @@ import org.ucd.shortlink.project.dto.resp.ShortLinkStatsAccessRecordRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkStatsRespDTO;
 import org.ucd.shortlink.project.service.ShortLinkStatsService;
 
-import java.io.StringWriter;
-import java.io.Writer;
+import java.util.UUID;
 
 /**
  * Short link monitor metrics controller
@@ -45,7 +42,6 @@ public class ShortLinkPrometheusStatsController {
     @Qualifier(value = "PrometheusStatsService")
     private final ShortLinkStatsService shortLinkStatsService;
 
-    private final CollectorRegistry registry;
 
     @GetMapping("/api/short-link/v1/prometheus/hello")
     public String hello() {
@@ -55,9 +51,7 @@ public class ShortLinkPrometheusStatsController {
     @SneakyThrows
     @GetMapping("/api/short-link/v1/prometheus/metrics")
     public String metrics() {
-        Writer writer = new StringWriter();
-        TextFormat.write004(writer, registry.metricFamilySamples());
-        return writer.toString();
+        return UUID.randomUUID().toString();
     }
 
     /**
