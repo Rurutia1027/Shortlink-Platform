@@ -17,6 +17,7 @@
 
 package org.ucd.shortlink.project.config;
 
+import io.prometheus.client.CollectorRegistry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,5 +36,10 @@ public class PrometheusConfiguration {
     @Bean("prometheusBaseUrl")
     public String prometheusBaseUrl() {
         return prometheusBaseUrl;
+    }
+
+    @Bean
+    public CollectorRegistry collectorRegistry() {
+        return new CollectorRegistry();
     }
 }
