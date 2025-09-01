@@ -17,8 +17,6 @@
 
 package org.ucd.shortlink.project.interceptor;
 
-import io.prometheus.client.Counter;
-import io.prometheus.client.Histogram;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
@@ -28,17 +26,7 @@ import java.util.Random;
 
 @Component
 public class MetricsInterceptor implements HandlerInterceptor {
-    private static final Counter requests = Counter.build()
-            .name("shortlink_project_requests_total")
-            .help("Total Requests.")
-            .labelNames("job")
-            .register();
 
-    private static final Histogram requestLatency = Histogram.build()
-            .name("shortlink_request_latency_seconds")
-            .help("Request latency in seconds.")
-            .labelNames("job")
-            .register();
 
     private final Random random = new Random();
 
@@ -49,8 +37,6 @@ public class MetricsInterceptor implements HandlerInterceptor {
             jobName = "default";
         }
 
-        requests.labels(jobName).inc();
-        request.setAttribute("timer", requestLatency.labels(jobName).startTimer());
 
         // simulate process some work here
         try {
@@ -61,10 +47,7 @@ public class MetricsInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        Histogram.Timer timer = (Histogram.Timer) request.getAttribute("timer");
-        if (timer != null) {
-            timer.observeDuration();
-        }
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
+                                Object handler, Exception ex) throws Exception {
     }
 }
