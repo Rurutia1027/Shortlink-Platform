@@ -37,11 +37,11 @@ import org.ucd.shortlink.project.dao.mapper.LinkDeviceStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkNetworkStatsMapper;
 import org.ucd.shortlink.project.dao.mapper.LinkOsStatsMapper;
-import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
-import org.ucd.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
-import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
-import org.ucd.shortlink.project.dto.resp.ShortLinkStatsAccessRecordRespDTO;
-import org.ucd.shortlink.project.dto.resp.ShortLinkStatsRespDTO;
+import org.ucd.shortlink.project.dto.req.metrics.ShortLinkGroupStatsAccessRecordReqDTO;
+import org.ucd.shortlink.project.dto.req.metrics.ShortLinkStatsAccessRecordReqDTO;
+import org.ucd.shortlink.project.dto.req.metrics.ShortLinkStatsReqDTO;
+import org.ucd.shortlink.project.dto.resp.metrics.ShortLinkStatsAccessRecordRespDTO;
+import org.ucd.shortlink.project.dto.resp.metrics.ShortLinkStatsRespDTO;
 
 import java.util.Date;
 import java.util.HashMap;

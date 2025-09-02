@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.dto.resp;
+package org.ucd.shortlink.project.dto.resp.metrics;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -26,32 +26,51 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 /**
- * Short link daily metric statistics
+ * Short link monitor metric record response bod
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortLinkStatsAccessDailyRespDTO {
+public class ShortLinkStatsAccessRecordRespDTO {
     /**
-     * Date
+     * Unique visitor type
      */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private String date;
+    private String uvType;
 
     /**
-     * Page View Cnt
+     * Browser
      */
-    private Integer pv;
+    private String browser;
 
     /**
-     * Unique User View
+     * OS type
      */
-    private Integer uv;
+    private String os;
 
     /**
-     * Unique IP Visit
+     * IP
      */
-    private Integer uip;
+    private String ip;
 
+    /**
+     * Device type
+     */
+    private String device;
+
+    /**
+     * Region
+     */
+    private String locale;
+
+    /**
+     * User info
+     */
+    private String user;
+
+    /**
+     * Visit timestamp
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
 }

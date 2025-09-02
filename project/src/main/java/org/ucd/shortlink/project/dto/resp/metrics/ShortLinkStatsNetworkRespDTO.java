@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.dto.req;
+package org.ucd.shortlink.project.dto.resp.metrics;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,30 +23,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Short link monitor metrics object
+ * Short link access network metric stats response bod
  */
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortLinkStatsReqDTO {
+public class ShortLinkStatsNetworkRespDTO {
     /**
-     * Full short link
+     * Total cnt
      */
-    private String fullShortLink;
+    private Integer cnt;
 
     /**
-     * Group ID
+     * Network info
      */
-    private String gid;
+    private String network;
 
     /**
-     * Monitor metrics Query Start Date
+     * Ration of current network cnt / total network cnt
      */
-    private String startDate;
-
-    /**
-     * Monitor metrics Query End Date
-     */
-    private String endDate;
+    private Double ratio;
 }

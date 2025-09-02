@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.dto.resp;
+package org.ucd.shortlink.project.dto.resp.metrics;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,20 +23,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * High frequency access IP monitor state response body
+ * Short link device monitor stats response body
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortLinkStatsTopIpRespDTO {
+public class ShortLinkStatsDeviceRespDTO {
     /**
      * Total cnt
      */
     private Integer cnt;
 
     /**
-     * IP
+     * Device type
      */
-    private String ip;
+    private String device;
+
+    /**
+     * Ration of current device / total device
+     */
+    private Double ratio;
 }

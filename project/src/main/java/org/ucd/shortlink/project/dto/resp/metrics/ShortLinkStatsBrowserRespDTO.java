@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.dto.resp;
+package org.ucd.shortlink.project.dto.resp.metrics;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,25 +24,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Short link device monitor stats response body
+ * Short link browser monitor metrics body
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortLinkStatsDeviceRespDTO {
+public class ShortLinkStatsBrowserRespDTO {
     /**
      * Total cnt
      */
     private Integer cnt;
 
     /**
-     * Device type
+     * Browser info
      */
-    private String device;
+    private String browser;
 
     /**
-     * Ration of current device / total device
+     * Ratio of current browser cnt / total browser cnt
      */
     private Double ratio;
 }

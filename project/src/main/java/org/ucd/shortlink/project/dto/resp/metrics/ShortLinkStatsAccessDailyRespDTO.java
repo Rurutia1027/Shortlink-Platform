@@ -15,33 +15,41 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.dto.resp;
+package org.ucd.shortlink.project.dto.resp.metrics;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Short link OS metrics response body
+ * Short link daily metric statistics
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortLinkStatsOsRespDTO {
+public class ShortLinkStatsAccessDailyRespDTO {
     /**
-     * Total cnt
+     * Date
      */
-    private Integer cnt;
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private String date;
 
     /**
-     * OS info
+     * Page View Cnt
      */
-    private String os;
+    private Integer pv;
 
     /**
-     * Ratio of current os / total os
+     * Unique User View
      */
-    private Double ratio;
+    private Integer uv;
+
+    /**
+     * Unique IP Visit
+     */
+    private Integer uip;
+
 }

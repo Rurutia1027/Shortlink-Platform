@@ -15,35 +15,33 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.dto.req;
+package org.ucd.shortlink.project.dto.resp.metrics;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.ucd.shortlink.project.dao.entity.LinkAccessLogsDO;
 
 /**
- * Grouped short link monitor metrics
+ * Short link monitor response body
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortLinkGroupStatsAccessRecordReqDTO extends Page<LinkAccessLogsDO> {
+public class ShortLinkStatsUvRespDTO {
     /**
-     * Group ID
+     * Total cnt
      */
-    private String gid;
+    private Integer cnt;
 
     /**
-     * Start Date
+     * Unique visitor type
      */
-    private String startDate;
+    private String uvType;
 
     /**
-     * End Date
+     * Ratio of current uv type / total uv type
      */
-    private String endDate;
+    private Double ratio;
 }
