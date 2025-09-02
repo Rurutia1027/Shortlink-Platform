@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.dto.resp;
+package org.ucd.shortlink.project.dto.resp.metrics;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

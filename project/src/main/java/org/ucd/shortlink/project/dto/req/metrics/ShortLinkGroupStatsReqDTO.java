@@ -15,33 +15,27 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.dto.resp;
+package org.ucd.shortlink.project.dto.req.metrics;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
- * Short link monitor region info response body
+ * Grouping short link monitor metrics
  */
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ShortLinkStatsLocaleRespDTO {
+public class ShortLinkGroupStatsReqDTO {
     /**
-     * Total cnt
+     * Group ID
      */
-    private Integer cnt;
+    private String gid;
 
     /**
-     * Region info
+     * Start Date
      */
-    private String locale;
+    private String startDate;
 
     /**
-     * Ration of current region / total region
+     * End Date
      */
-    private Double ratio;
+    private String endDate;
 }

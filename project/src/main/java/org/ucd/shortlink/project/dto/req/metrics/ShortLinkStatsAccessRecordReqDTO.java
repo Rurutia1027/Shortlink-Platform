@@ -15,34 +15,41 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.dto.resp;
+package org.ucd.shortlink.project.dto.req.metrics;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.ucd.shortlink.project.dao.entity.LinkAccessLogsDO;
 
 /**
- * Short link access network metric stats response bod
+ * Short link monitor record request param
  */
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortLinkStatsNetworkRespDTO {
-    /**
-     * Total cnt
-     */
-    private Integer cnt;
+public class ShortLinkStatsAccessRecordReqDTO extends Page<LinkAccessLogsDO> {
 
     /**
-     * Network info
+     * Full short link
      */
-    private String network;
+    private String fullShortUrl;
 
     /**
-     * Ration of current network cnt / total network cnt
+     * Group ID
      */
-    private Double ratio;
+    private String gid;
+
+    /**
+     * Start date
+     */
+    private String startDate;
+
+    /**
+     * End date
+     */
+    private String endDate;
 }

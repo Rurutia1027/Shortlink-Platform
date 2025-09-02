@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.dto.resp;
+package org.ucd.shortlink.project.dto.resp.metrics;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,25 +23,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Short link monitor response body
+ * Short link OS metrics response body
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortLinkStatsUvRespDTO {
+public class ShortLinkStatsOsRespDTO {
     /**
      * Total cnt
      */
     private Integer cnt;
 
     /**
-     * Unique visitor type
+     * OS info
      */
-    private String uvType;
+    private String os;
 
     /**
-     * Ratio of current uv type / total uv type
+     * Ratio of current os / total os
      */
     private Double ratio;
 }

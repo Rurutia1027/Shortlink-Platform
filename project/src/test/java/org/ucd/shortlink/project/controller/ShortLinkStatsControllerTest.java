@@ -30,8 +30,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.ucd.shortlink.project.common.convention.result.Result;
-import org.ucd.shortlink.project.dto.resp.ShortLinkStatsAccessRecordRespDTO;
-import org.ucd.shortlink.project.dto.resp.ShortLinkStatsRespDTO;
+import org.ucd.shortlink.project.dto.resp.metrics.ShortLinkStatsAccessRecordRespDTO;
+import org.ucd.shortlink.project.dto.resp.metrics.ShortLinkStatsRespDTO;
 import org.ucd.shortlink.project.service.ShortLinkStatsService;
 
 import java.util.Date;

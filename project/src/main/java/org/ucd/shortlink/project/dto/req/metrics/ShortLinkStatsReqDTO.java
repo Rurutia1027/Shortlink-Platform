@@ -15,28 +15,25 @@
  * limitations under the License.
  */
 
-package org.ucd.shortlink.project.dto.req;
+package org.ucd.shortlink.project.dto.req.metrics;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.ucd.shortlink.project.dao.entity.LinkAccessLogsDO;
 
 /**
- * Short link monitor record request param
+ * Short link monitor metrics object
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShortLinkStatsAccessRecordReqDTO extends Page<LinkAccessLogsDO> {
-
+public class ShortLinkStatsReqDTO {
     /**
      * Full short link
      */
-    private String fullShortUrl;
+    private String fullShortLink;
 
     /**
      * Group ID
@@ -44,12 +41,12 @@ public class ShortLinkStatsAccessRecordReqDTO extends Page<LinkAccessLogsDO> {
     private String gid;
 
     /**
-     * Start date
+     * Monitor metrics Query Start Date
      */
     private String startDate;
 
     /**
-     * End date
+     * Monitor metrics Query End Date
      */
     private String endDate;
 }

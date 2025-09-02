@@ -22,8 +22,8 @@ import org.apache.ibatis.annotations.Select;
 import org.springframework.data.repository.query.Param;
 import org.ucd.shortlink.project.dao.entity.LinkAccessLogsDO;
 import org.ucd.shortlink.project.dao.entity.LinkAccessStatsDO;
-import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsReqDTO;
-import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
+import org.ucd.shortlink.project.dto.req.metrics.ShortLinkGroupStatsReqDTO;
+import org.ucd.shortlink.project.dto.req.metrics.ShortLinkStatsReqDTO;
 
 import java.util.HashMap;
 import java.util.List;

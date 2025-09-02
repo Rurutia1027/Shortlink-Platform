@@ -18,11 +18,11 @@
 package org.ucd.shortlink.project.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.ucd.shortlink.project.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
-import org.ucd.shortlink.project.dto.req.ShortLinkStatsAccessRecordReqDTO;
-import org.ucd.shortlink.project.dto.req.ShortLinkStatsReqDTO;
-import org.ucd.shortlink.project.dto.resp.ShortLinkStatsAccessRecordRespDTO;
-import org.ucd.shortlink.project.dto.resp.ShortLinkStatsRespDTO;
+import org.ucd.shortlink.project.dto.req.metrics.ShortLinkGroupStatsAccessRecordReqDTO;
+import org.ucd.shortlink.project.dto.req.metrics.ShortLinkStatsAccessRecordReqDTO;
+import org.ucd.shortlink.project.dto.req.metrics.ShortLinkStatsReqDTO;
+import org.ucd.shortlink.project.dto.resp.metrics.ShortLinkStatsAccessRecordRespDTO;
+import org.ucd.shortlink.project.dto.resp.metrics.ShortLinkStatsRespDTO;
 
 /**
  * Short link monitor interface layer
