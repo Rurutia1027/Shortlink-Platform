@@ -74,7 +74,7 @@ public class ShortLinkMetricsAspect {
         String gaugeKey = gid + ":" + fullShortUrl;
         AtomicLong gaugeValue = uvGauges.computeIfAbsent(gaugeKey, key -> {
             AtomicLong holder = new AtomicLong(0);
-            Gauge.builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_SHORT_URL_UNIQUE_USERS_TOTAL_METRIC_NAME,
+            Gauge.builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_UNIQUE_USERS_TOTAL_METRIC_NAME,
                             holder, AtomicLong::get)
                     .description("Unique visitors for short links")
                     .tags("gid", gid, "fullShortUrl", fullShortUrl)
