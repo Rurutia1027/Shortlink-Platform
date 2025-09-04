@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.ucd.shortlink.project.micrometer.aop.ShortLinkMetricsAspect;
 import org.ucd.shortlink.project.micrometer.aop.ShortLinkPvAspect;
+import org.ucd.shortlink.project.micrometer.aop.ShortLinkUniqueIpAspect;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -39,5 +40,10 @@ public class MicrometerConfig {
     @Bean
     public ShortLinkMetricsAspect shortLinkMetricsAspect(MeterRegistry registry) {
         return new ShortLinkMetricsAspect(registry);
+    }
+
+    @Bean
+    public ShortLinkUniqueIpAspect shortLinkUniqueIpAspect(MeterRegistry registry) {
+        return new ShortLinkUniqueIpAspect(registry);
     }
 }

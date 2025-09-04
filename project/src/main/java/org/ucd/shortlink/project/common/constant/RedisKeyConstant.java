@@ -41,4 +41,5 @@ public class RedisKeyConstant {
      * Short link redis cache uv counter key
      */
     public static final String REDIS_KEY_SHORT_LINK_RESTORE_UV_KEY = "short-link:stats:uv";
+    public static final String REDIS_KEY_STATS_UIP = "short-link:stats:uip";
 }

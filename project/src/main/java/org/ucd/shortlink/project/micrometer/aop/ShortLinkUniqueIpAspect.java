@@ -23,65 +23,78 @@ import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.ucd.shortlink.project.common.constant.RedisKeyConstant;
 import org.ucd.shortlink.project.dto.resp.ShortLinkInfoRespDTO;
-import org.ucd.shortlink.project.micrometer.common.constant.MicrometerMetricsConstatns;
 import org.ucd.shortlink.project.service.ShortLinkService;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.ucd.shortlink.project.common.constant.RedisKeyConstant.REDIS_KEY_SHORT_LINK_RESTORE_UV_KEY;
+import static org.ucd.shortlink.project.toolkit.LinkUtil.getActualIp;
 
+@Slf4j
 @Aspect
 @RequiredArgsConstructor
-public class ShortLinkMetricsAspect {
+public class ShortLinkUniqueIpAspect {
     private final MeterRegistry registry;
-
+    @Autowired
+    private StringRedisTemplate redisTemplate;
     @Autowired
     private ShortLinkService shortLinkService;
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
-
     // Cache Gauges to avoid re-registering them every request
-    private final ConcurrentHashMap<String, AtomicLong> uvGauges = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, AtomicLong> uipGauges = new ConcurrentHashMap<>();
 
-    @Around("execution(* org.ucd.shortlink.project.controller..*.restoreUrl(..)) && args(shortUri, request, response)")
-    public Object trackShortLinkTotalPv(ProceedingJoinPoint joinPoint,
-                                        String shortUri,
-                                        HttpServletRequest request,
-                                        HttpServletResponse response) throws Throwable {
+    @Around("execution(* org.ucd.shortlink.project.controller..*.restoreUrl(..)) && args" +
+            "(shortUri, request, response)")
+    public Object trackUniqueIp(ProceedingJoinPoint joinPoint,
+                                String shortUri,
+                                HttpServletRequest request,
+                                HttpServletResponse response) throws Throwable {
         Object result = joinPoint.proceed();
+
         if (StrUtil.isBlank(shortUri) || !shortLinkService.exists(shortUri)) {
             return result;
         }
 
-        ShortLinkInfoRespDTO resp = shortLinkService.queryShortLinkInfo(shortUri);
-        String gid = resp.getGid();
-        String fullShortUrl = resp.getFullShortUrl();
+        // fetch gid + fullShortUrl via given shortUri
+        ShortLinkInfoRespDTO respDTO = shortLinkService.queryShortLinkInfo(shortUri);
+        String gid = respDTO.getGid() != null ? respDTO.getGid() : "unknown";
+        String fullShortUrl = respDTO.getFullShortUrl() != null ? respDTO.getFullShortUrl()
+                : "unknown";
 
-        // UV Gauge (snapshot value from Redis set)
-        String redisKey = String.format(REDIS_KEY_SHORT_LINK_RESTORE_UV_KEY + ":%s:%s",
-                gid, fullShortUrl);
-        Long uvSize = stringRedisTemplate.opsForSet().size(redisKey);
-        long uvCount = (uvSize != null) ? uvSize : 0;
-        // Use cached AtomicLong for Prometheus gauge
+        // extract client ip from request
+        String clientIp = getActualIp(request);
+        if (StrUtil.isBlank(clientIp)) {
+            return result;
+        }
+
+        // Store into Redis Set TODO: refine this with PFADD for hyperloglog
+        String redisKey =
+                RedisKeyConstant.REDIS_KEY_STATS_UIP + ":" + gid + ":" + fullShortUrl;
+        redisTemplate.opsForSet().add(redisKey, clientIp);
+        Long uipSize = redisTemplate.opsForSet().size(redisKey);
+        long uipCount = (uipSize != null) ? uipSize : 0L;
+
+        // register / update Gauge
         String gaugeKey = gid + ":" + fullShortUrl;
-        AtomicLong gaugeValue = uvGauges.computeIfAbsent(gaugeKey, key -> {
+        AtomicLong gaugeValue = uipGauges.computeIfAbsent(gaugeKey, key -> {
             AtomicLong holder = new AtomicLong(0);
-            Gauge.builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_UNIQUE_USERS_TOTAL_METRIC_NAME,
-                            holder, AtomicLong::get)
-                    .description("Unique visitors for short links")
+            Gauge.builder("shortlink_unique_ip_total", holder, AtomicLong::get)
+                    .description("Unique IPs accessing the short link")
                     .tags("gid", gid, "fullShortUrl", fullShortUrl)
                     .register(registry);
             return holder;
         });
-        gaugeValue.set(uvCount);
+
+        gaugeValue.set(uipCount);
+
         return result;
     }
 }

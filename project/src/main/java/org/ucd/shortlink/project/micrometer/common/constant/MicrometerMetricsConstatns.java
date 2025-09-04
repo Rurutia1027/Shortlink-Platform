@@ -19,8 +19,11 @@ package org.ucd.shortlink.project.micrometer.common.constant;
 
 public class MicrometerMetricsConstatns {
     public static String JOB_NAME_SHORTLINK_PROJECT = "shortlink-service";
-    public static String METRIC_NAME_SHORTLINK_SHORT_URL_PAGE_VIEWS_TOTAL_METRIC_NAME =
-            "shortlink_short_url_page_views_total";
-    public static String METRIC_NAME_SHORTLINK_SHORT_URL_UNIQUE_USERS_TOTAL_METRIC_NAME =
-            "shortlink_short_url_unique_users_total";
+    public static String METRIC_NAME_SHORTLINK_PAGE_VIEWS_TOTAL_METRIC_NAME =
+            "shortlink_page_views_total";
+    public static String METRIC_NAME_SHORTLINK_UNIQUE_USERS_TOTAL_METRIC_NAME =
+            "shortlink_unique_users_total";
+
+    public static String METRIC_NAME_SHORTLINK_UNIQUE_IP_TOTAL_METRIC_NAME =
+            "shortlink_unique_ip_total";
 }

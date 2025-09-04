@@ -49,7 +49,7 @@ public class ShortLinkPvAspect {
             String fullShortUrl = resp.getFullShortUrl();
 
             Counter counter = Counter
-                    .builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_SHORT_URL_PAGE_VIEWS_TOTAL_METRIC_NAME)
+                    .builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_PAGE_VIEWS_TOTAL_METRIC_NAME)
                     .description("Total page views for short links")
                     .tags("job", MicrometerMetricsConstatns.JOB_NAME_SHORTLINK_PROJECT,
                             "gid", gid != null ? gid : "unknown",
