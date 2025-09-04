@@ -27,6 +27,21 @@ spring:
       prefix: /templates/
       suffix: .html
 
+# Micrometer + Prometheus integration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+
 short-link:
   prometheus:
     url: localhost:9090
