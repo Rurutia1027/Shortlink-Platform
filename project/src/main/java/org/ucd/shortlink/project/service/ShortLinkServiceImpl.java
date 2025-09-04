@@ -36,7 +36,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -82,8 +81,8 @@ import org.ucd.shortlink.project.dto.resp.ShortLinkBaseInfoRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkInfoRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
-import org.ucd.shortlink.project.service.ShortLinkService;
 import org.ucd.shortlink.project.toolkit.HashUtil;
 import org.ucd.shortlink.project.toolkit.LinkUtil;
 
@@ -421,6 +420,21 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         }
 
     }
+
+    // TODO: query from db
+    @Override
+    public boolean exists(String shortUri) {
+        return true;
+    }
+
+    @Override
+    public ShortLinkInfoRespDTO queryShortLinkInfo(String shortUri) {
+        return ShortLinkInfoRespDTO.builder()
+                .gid(UUID.fastUUID().toString())
+                .fullShortUrl(UUID.fastUUID().toString())
+                .build();
+    }
+
 
     private Boolean isShortUriCacheAvailable(String fullShortUrl) {
         return !shortUriCreationCachePenetrationBloomFilter.contains(fullShortUrl);

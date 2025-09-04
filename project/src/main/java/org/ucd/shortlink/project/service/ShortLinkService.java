@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.ucd.shortlink.project.dao.entity.ShortLinkDO;
 import org.ucd.shortlink.project.dto.req.ShortLinkBatchCreateReqDTO;
@@ -31,6 +30,7 @@ import org.ucd.shortlink.project.dto.req.ShortLinkUpdateReqDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkCreateRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkGroupCountQueryRespDTO;
+import org.ucd.shortlink.project.dto.resp.ShortLinkInfoRespDTO;
 import org.ucd.shortlink.project.dto.resp.ShortLinkPageRespDTO;
 
 import java.util.List;
@@ -86,4 +86,8 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @param response http response
      */
     void restoreUrl(String shortUri, HttpServletRequest request, HttpServletResponse response);
+
+    boolean exists(String shortUri);
+
+    ShortLinkInfoRespDTO queryShortLinkInfo(String shortUri);
 }
