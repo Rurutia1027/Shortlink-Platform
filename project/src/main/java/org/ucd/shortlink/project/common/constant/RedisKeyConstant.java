@@ -36,4 +36,9 @@ public class RedisKeyConstant {
      * Short link redirection distributed lock (via Redis)
      */
     public static final String LOCK_REDIRECT_SHORT_LINK_KEY = "short-link_lock_redirect_%s";
+
+    /**
+     * Short link redis cache uv counter key
+     */
+    public static final String REDIS_KEY_SHORT_LINK_RESTORE_UV_KEY = "short-link:stats:uv";
 }
