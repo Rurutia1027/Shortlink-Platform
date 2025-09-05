@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.ucd.shortlink.project.common.constant.RedisKeyConstant;
 import org.ucd.shortlink.project.dto.resp.ShortLinkInfoRespDTO;
-import org.ucd.shortlink.project.micrometer.common.constant.MicrometerMetricsConstatns;
+import org.ucd.shortlink.project.micrometer.common.constant.MicrometerMetricsConstants;
 import org.ucd.shortlink.project.service.ShortLinkService;
 
 import java.time.LocalDate;
@@ -83,18 +83,18 @@ public class ShortLinkIPMetricsAspect {
         Long added = redisTemplate.opsForSet().add(redisKey, clientIp);
 
         if (added != null && added > 0) {
-            Counter.builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_UNIQUE_IP_TOTAL)
+            Counter.builder(MicrometerMetricsConstants.METRIC_NAME_SHORTLINK_UNIQUE_IP_TOTAL)
                     .description("Unique IP visits for short links")
-                    .tags("job", MicrometerMetricsConstatns.JOB_NAME_SHORTLINK_PROJECT,
+                    .tags("job", MicrometerMetricsConstants.JOB_NAME_SHORTLINK_PROJECT,
                             "gid", gid, "fullShortUrl", fullShortUrl)
                     .register(registry)
                     .increment();
         }
 
         // ---- Top IP Counter ----
-        Counter.builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_IP_HITS_TOTAL)
+        Counter.builder(MicrometerMetricsConstants.METRIC_NAME_SHORTLINK_IP_HITS_TOTAL)
                 .description("Raw IP hits for short links (used for top IP queries)")
-                .tags("job", MicrometerMetricsConstatns.JOB_NAME_SHORTLINK_PROJECT,
+                .tags("job", MicrometerMetricsConstants.JOB_NAME_SHORTLINK_PROJECT,
                         "gid", gid, "fullShortUrl", fullShortUrl, "ip", clientIp)
                 .register(registry)
                 .increment();

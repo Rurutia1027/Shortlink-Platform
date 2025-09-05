@@ -29,7 +29,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.ucd.shortlink.project.dto.resp.ShortLinkInfoRespDTO;
-import org.ucd.shortlink.project.micrometer.common.constant.MicrometerMetricsConstatns;
+import org.ucd.shortlink.project.micrometer.common.constant.MicrometerMetricsConstants;
 import org.ucd.shortlink.project.prometheus.dto.PrometheusQueryReqDTO;
 import org.ucd.shortlink.project.prometheus.dto.PrometheusRespDTO;
 import org.ucd.shortlink.project.prometheus.service.PrometheusService;
@@ -68,9 +68,9 @@ public class ShortLinkUVMetricsAspect {
         String fullShortUrl = resp.getFullShortUrl() != null ? resp.getFullShortUrl() : "unknown";
 
         // ---- UV Counter ----
-        Counter.builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_UNIQUE_USERS_TOTAL)
+        Counter.builder(MicrometerMetricsConstants.METRIC_NAME_SHORTLINK_UNIQUE_USERS_TOTAL)
                 .description("Unique Visitors for short links")
-                .tags("job", MicrometerMetricsConstatns.JOB_NAME_SHORTLINK_PROJECT,
+                .tags("job", MicrometerMetricsConstants.JOB_NAME_SHORTLINK_PROJECT,
                         "gid", gid, "fullShortUrl", fullShortUrl)
                 .register(registry)
                 .increment();
@@ -93,11 +93,11 @@ public class ShortLinkUVMetricsAspect {
     private boolean checkIfOldUser(String gid, String fullShortUrl) {
         try {
             PrometheusQueryReqDTO queryReq = new PrometheusQueryReqDTO();
-            queryReq.setMetricName(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_UNIQUE_USERS_TOTAL);
+            queryReq.setMetricName(MicrometerMetricsConstants.METRIC_NAME_SHORTLINK_UNIQUE_USERS_TOTAL);
             queryReq.setStartDate("1970-01-01");
             queryReq.setEndDate(DateUtil.now());
             queryReq.setStep("1h");
-            queryReq.setJob(MicrometerMetricsConstatns.JOB_NAME_SHORTLINK_PROJECT);
+            queryReq.setJob(MicrometerMetricsConstants.JOB_NAME_SHORTLINK_PROJECT);
 
             PrometheusRespDTO resp = prometheusService.queryPrometheusMetric(queryReq);
 
