@@ -28,6 +28,7 @@ public class MicrometerMetricsConstatns {
 
     public static final String METRIC_NAME_SHORTLINK_IP_HITS_TOTAL = "shortlink_ip_hits_total";
 
-    public static final String METRIC_NAME_SHORTLINK_BROWSER_TOTAL =
-            "shortlink_browser_total";
+    public static final String METRIC_NAME_SHORTLINK_BROWSER_TOTAL = "shortlink_browser_total";
+
+    public static final String METRIC_NAME_SHORTLINK_OS_TOTAL = "shortlink_os_total";
 }
