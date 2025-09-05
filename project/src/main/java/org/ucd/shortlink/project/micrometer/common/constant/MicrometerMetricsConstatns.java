@@ -18,17 +18,23 @@
 package org.ucd.shortlink.project.micrometer.common.constant;
 
 public class MicrometerMetricsConstatns {
-    public static String JOB_NAME_SHORTLINK_PROJECT = "shortlink-service";
+    public static final String JOB_NAME_SHORTLINK_PROJECT = "shortlink-service";
 
-    public static String METRIC_NAME_SHORTLINK_PAGE_VIEWS_TOTAL = "shortlink_page_views_total";
+    public static final String METRIC_NAME_SHORTLINK_PAGE_VIEWS_TOTAL =
+            "shortlink_page_views_total";
 
-    public static String METRIC_NAME_SHORTLINK_UNIQUE_USERS_TOTAL = "shortlink_unique_users_total";
+    public static final String METRIC_NAME_SHORTLINK_UNIQUE_USERS_TOTAL =
+            "shortlink_unique_users_total";
 
-    public static String METRIC_NAME_SHORTLINK_UNIQUE_IP_TOTAL = "shortlink_unique_ip_total";
+    public static final String METRIC_NAME_SHORTLINK_UNIQUE_IP_TOTAL =
+            "shortlink_unique_ip_total";
 
     public static final String METRIC_NAME_SHORTLINK_IP_HITS_TOTAL = "shortlink_ip_hits_total";
 
-    public static final String METRIC_NAME_SHORTLINK_BROWSER_TOTAL = "shortlink_browser_total";
+    public static final String METRIC_NAME_SHORTLINK_BROWSER_TYPE_TOTAL =
+            "shortlink_browser_type_total";
 
-    public static final String METRIC_NAME_SHORTLINK_OS_TOTAL = "shortlink_os_total";
+    public static final String METRIC_NAME_SHORTLINK_OS_TYPE_TOTAL = "shortlink_os_type_total";
+    public static final String METRIC_NAME_SHORTLINK_DEVICE_TYPE_TOTAL =
+            "shortlink_device_type_total";
 }

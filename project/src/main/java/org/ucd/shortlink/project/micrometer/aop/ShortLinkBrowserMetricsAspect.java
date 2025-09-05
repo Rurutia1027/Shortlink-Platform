@@ -65,7 +65,7 @@ public class ShortLinkBrowserMetricsAspect {
         }
 
         // Micrometer Counter with tags
-        Counter.builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_BROWSER_TOTAL)
+        Counter.builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_BROWSER_TYPE_TOTAL)
                 .description("Shortlink requests grouped by browser type")
                 .tags("job", MicrometerMetricsConstatns.JOB_NAME_SHORTLINK_PROJECT,
                         "gid", gid,
