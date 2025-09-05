@@ -18,7 +18,7 @@
 package org.ucd.shortlink.project.micrometer.aop;
 
 import cn.hutool.core.util.StrUtil;
-import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,8 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.ucd.shortlink.project.common.constant.RedisKeyConstant;
 import org.ucd.shortlink.project.dto.resp.ShortLinkInfoRespDTO;
+import org.ucd.shortlink.project.micrometer.common.constant.MicrometerMetricsConstatns;
 import org.ucd.shortlink.project.service.ShortLinkService;
 
+import java.time.LocalDate;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -41,7 +43,7 @@ import static org.ucd.shortlink.project.toolkit.LinkUtil.getActualIp;
 @Slf4j
 @Aspect
 @RequiredArgsConstructor
-public class ShortLinkUniqueIpAspect {
+public class ShortLinkIPMetricsAspect {
     private final MeterRegistry registry;
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -75,25 +77,27 @@ public class ShortLinkUniqueIpAspect {
             return result;
         }
 
-        // Store into Redis Set TODO: refine this with PFADD for hyperloglog
-        String redisKey =
-                RedisKeyConstant.REDIS_KEY_STATS_UIP + ":" + gid + ":" + fullShortUrl;
-        redisTemplate.opsForSet().add(redisKey, clientIp);
-        Long uipSize = redisTemplate.opsForSet().size(redisKey);
-        long uipCount = (uipSize != null) ? uipSize : 0L;
+        // ---- UIP Metric Here ----
+        String redisKey = String.format(RedisKeyConstant.REDIS_KEY_STATS_UIP + ":%s:%s:%s",
+                fullShortUrl, gid, LocalDate.now());
+        Long added = redisTemplate.opsForSet().add(redisKey, clientIp);
 
-        // register / update Gauge
-        String gaugeKey = gid + ":" + fullShortUrl;
-        AtomicLong gaugeValue = uipGauges.computeIfAbsent(gaugeKey, key -> {
-            AtomicLong holder = new AtomicLong(0);
-            Gauge.builder("shortlink_unique_ip_total", holder, AtomicLong::get)
-                    .description("Unique IPs accessing the short link")
-                    .tags("gid", gid, "fullShortUrl", fullShortUrl)
-                    .register(registry);
-            return holder;
-        });
+        if (added != null && added > 0) {
+            Counter.builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_UNIQUE_IP_TOTAL)
+                    .description("Unique IP visits for short links")
+                    .tags("job", MicrometerMetricsConstatns.JOB_NAME_SHORTLINK_PROJECT,
+                            "gid", gid, "fullShortUrl", fullShortUrl)
+                    .register(registry)
+                    .increment();
+        }
 
-        gaugeValue.set(uipCount);
+        // ---- Top IP Counter ----
+        Counter.builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_IP_HITS_TOTAL)
+                .description("Raw IP hits for short links (used for top IP queries)")
+                .tags("job", MicrometerMetricsConstatns.JOB_NAME_SHORTLINK_PROJECT,
+                        "gid", gid, "fullShortUrl", fullShortUrl, "ip", clientIp)
+                .register(registry)
+                .increment();
 
         return result;
     }
