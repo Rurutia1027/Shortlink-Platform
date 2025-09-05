@@ -27,6 +27,7 @@ import org.ucd.shortlink.project.dao.entity.GeoIpInfoDO;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 @ExtendWith(SpringExtension.class)
@@ -61,5 +62,41 @@ public class GeoIpServiceTest {
 
         GeoIpInfoDO unknown = service.resolveFull("255.255.255.255");
         assertEquals(null, unknown); // or handle as UNKNOWN
+    }
+    @Test
+    public void testGeoIp_CN() {
+        GeoIpInfoDO cnInfo = service.resolveFull("114.114.114.114");
+        assertNotNull(cnInfo);
+        assertEquals("CN", cnInfo.getCountryCode());
+        assertEquals("China", cnInfo.getCountry());
+        assertNotNull(cnInfo.getProvince());
+        assertNotNull(cnInfo.getCity());
+        assertNotNull(cnInfo.getAdcode());
+    }
+
+    @Test
+    public void testGeoIp_US() {
+        GeoIpInfoDO usInfo = service.resolveFull("8.8.8.8");
+        assertNotNull(usInfo);
+        assertEquals("US", usInfo.getCountryCode());
+        assertEquals("United States", usInfo.getCountry());
+        assertNotNull(usInfo.getProvince());
+        assertNotNull(usInfo.getCity());
+    }
+
+    @Test
+    public void testGeoIp_AU() {
+        GeoIpInfoDO auInfo = service.resolveFull("1.1.1.1");
+        assertNotNull(auInfo);
+        assertEquals("AU", auInfo.getCountryCode());
+        assertEquals("Australia", auInfo.getCountry());
+        assertNotNull(auInfo.getProvince());
+        assertNotNull(auInfo.getCity());
+    }
+
+    @Test
+    public void testGeoIp_InvalidIP() {
+        GeoIpInfoDO unknown = service.resolveFull("255.255.255.255");
+        assertNull(unknown); // Expect null or your "UNKNOWN" handling
     }
 }
