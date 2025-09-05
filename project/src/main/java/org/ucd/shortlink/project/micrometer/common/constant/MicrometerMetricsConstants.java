@@ -40,4 +40,7 @@ public class MicrometerMetricsConstants {
 
     public static final String METRIC_NAME_SHORTLINK_NETWORK_TYPE_TOTAL =
             "shortlink_network_type_total";
+
+    public static final String METRIC_NAME_SHORTLINK_LOCALE_TYPE_TOTAL =
+            "shortlink_locale_type_total";
 }
