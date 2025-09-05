@@ -22,9 +22,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.ucd.shortlink.project.micrometer.aop.ShortLinkBrowserMetricsAspect;
+import org.ucd.shortlink.project.micrometer.aop.ShortLinkIPMetricsAspect;
 import org.ucd.shortlink.project.micrometer.aop.ShortLinkMetricsAspect;
 import org.ucd.shortlink.project.micrometer.aop.ShortLinkPvMetricsAspect;
-import org.ucd.shortlink.project.micrometer.aop.ShortLinkIPMetricsAspect;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -45,5 +46,10 @@ public class MicrometerConfig {
     @Bean
     public ShortLinkIPMetricsAspect shortLinkUniqueIpAspect(MeterRegistry registry) {
         return new ShortLinkIPMetricsAspect(registry);
+    }
+
+    @Bean
+    public ShortLinkBrowserMetricsAspect shortLinkBrowserMetricsAspect(MeterRegistry registry) {
+        return new ShortLinkBrowserMetricsAspect(registry);
     }
 }

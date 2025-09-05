@@ -27,4 +27,7 @@ public class MicrometerMetricsConstatns {
     public static String METRIC_NAME_SHORTLINK_UNIQUE_IP_TOTAL = "shortlink_unique_ip_total";
 
     public static final String METRIC_NAME_SHORTLINK_IP_HITS_TOTAL = "shortlink_ip_hits_total";
+
+    public static final String METRIC_NAME_SHORTLINK_BROWSER_TOTAL =
+            "shortlink_browser_total";
 }
