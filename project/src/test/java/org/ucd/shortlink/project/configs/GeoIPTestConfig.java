@@ -17,24 +17,15 @@
 
 package org.ucd.shortlink.project.configs;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.web.client.RestTemplate;
 import org.ucd.shortlink.project.service.GeoIpService;
 
 @TestConfiguration
 public class GeoIPTestConfig {
-    @Bean("testGeoIPRestTemplate")
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
     @Bean("testGeoIpService")
-    public GeoIpService geoIpService(@Qualifier("testGeoIPRestTemplate") RestTemplate restTemplate) {
+    public GeoIpService geoIpService() {
         GeoIpService ret = new GeoIpService();
-        ret.setRestTemplate(restTemplate);
         return ret;
     }
 }

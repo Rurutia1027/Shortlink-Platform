@@ -18,7 +18,6 @@
 package org.ucd.shortlink.project.service;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -29,10 +28,9 @@ import java.util.Map;
 @Data
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class GeoIpService {
     private static final String GEO_IP_API_URL = "http://ip-api.com/json/";
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     /**
      * Resolve IP to country code (CN, US, etc.)
