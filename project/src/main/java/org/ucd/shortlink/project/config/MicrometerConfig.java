@@ -26,6 +26,7 @@ import org.ucd.shortlink.project.micrometer.aop.ShortLinkBrowserMetricsAspect;
 import org.ucd.shortlink.project.micrometer.aop.ShortLinkDeviceMetricsAspect;
 import org.ucd.shortlink.project.micrometer.aop.ShortLinkIPMetricsAspect;
 import org.ucd.shortlink.project.micrometer.aop.ShortLinkMetricsAspect;
+import org.ucd.shortlink.project.micrometer.aop.ShortLinkNetworkMetricsAspect;
 import org.ucd.shortlink.project.micrometer.aop.ShortLinkOsMetricsAspect;
 import org.ucd.shortlink.project.micrometer.aop.ShortLinkPvMetricsAspect;
 
@@ -63,5 +64,10 @@ public class MicrometerConfig {
     @Bean
     public ShortLinkDeviceMetricsAspect shortLinkDeviceMetricsAspect(MeterRegistry registry) {
         return new ShortLinkDeviceMetricsAspect(registry);
+    }
+
+    @Bean
+    public ShortLinkNetworkMetricsAspect shortLinkNetworkMetricsAspect(MeterRegistry registry) {
+        return new ShortLinkNetworkMetricsAspect(registry);
     }
 }

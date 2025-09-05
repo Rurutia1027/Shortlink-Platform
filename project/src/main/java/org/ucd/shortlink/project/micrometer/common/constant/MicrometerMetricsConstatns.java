@@ -37,4 +37,7 @@ public class MicrometerMetricsConstatns {
     public static final String METRIC_NAME_SHORTLINK_OS_TYPE_TOTAL = "shortlink_os_type_total";
     public static final String METRIC_NAME_SHORTLINK_DEVICE_TYPE_TOTAL =
             "shortlink_device_type_total";
+
+    public static final String METRIC_NAME_SHORTLINK_NETWORK_TYPE_TOTAL =
+            "shortlink_network_type_total";
 }
