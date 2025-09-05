@@ -17,7 +17,7 @@
 
 package org.ucd.shortlink.project.micrometer.common.constant;
 
-public class MicrometerMetricsConstatns {
+public class MicrometerMetricsConstants {
     public static final String JOB_NAME_SHORTLINK_PROJECT = "shortlink-service";
 
     public static final String METRIC_NAME_SHORTLINK_PAGE_VIEWS_TOTAL =
@@ -40,4 +40,7 @@ public class MicrometerMetricsConstatns {
 
     public static final String METRIC_NAME_SHORTLINK_NETWORK_TYPE_TOTAL =
             "shortlink_network_type_total";
+
+    public static final String METRIC_NAME_SHORTLINK_LOCALE_TYPE_TOTAL =
+            "shortlink_locale_type_total";
 }

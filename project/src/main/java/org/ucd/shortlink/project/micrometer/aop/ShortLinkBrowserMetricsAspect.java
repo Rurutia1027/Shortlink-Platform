@@ -29,7 +29,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.ucd.shortlink.project.dto.resp.ShortLinkInfoRespDTO;
-import org.ucd.shortlink.project.micrometer.common.constant.MicrometerMetricsConstatns;
+import org.ucd.shortlink.project.micrometer.common.constant.MicrometerMetricsConstants;
 import org.ucd.shortlink.project.service.ShortLinkService;
 import org.ucd.shortlink.project.toolkit.LinkUtil;
 
@@ -65,9 +65,9 @@ public class ShortLinkBrowserMetricsAspect {
         }
 
         // Micrometer Counter with tags
-        Counter.builder(MicrometerMetricsConstatns.METRIC_NAME_SHORTLINK_BROWSER_TYPE_TOTAL)
+        Counter.builder(MicrometerMetricsConstants.METRIC_NAME_SHORTLINK_BROWSER_TYPE_TOTAL)
                 .description("Shortlink requests grouped by browser type")
-                .tags("job", MicrometerMetricsConstatns.JOB_NAME_SHORTLINK_PROJECT,
+                .tags("job", MicrometerMetricsConstants.JOB_NAME_SHORTLINK_PROJECT,
                         "gid", gid,
                         "fullShortUrl", fullShortUrl,
                         "browser", browser)
