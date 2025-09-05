@@ -64,6 +64,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Short link monitor interface implementor
  */
+// TODO: this gonna be deprecated after we impl&&test stats service via prometheus service
+@Deprecated
 @Primary
 @Service("DBStatsService")
 @RequiredArgsConstructor
